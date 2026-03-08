@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gymmap.nl - Sportlocaties in Nederland</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+
         :root {
             color-scheme: light;
             --bg: #f4f7fb;
@@ -24,18 +26,96 @@
             color: var(--text);
         }
 
+        .site-nav {
+            width: 100%;
+            background: #ffffff;
+            border-bottom: 1px solid #d9e4ee;
+        }
+
+        .site-nav-inner {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .nav-logo img {
+            height: 42px;
+            width: auto;
+            display: block;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: flex-end;
+            gap: 22px;
+            font-family: "Poppins", "Segoe UI", sans-serif;
+            font-weight: 300;
+            font-size: 15px;
+        }
+
+        .nav-menu a {
+            color: #21415e;
+            text-decoration: none;
+        }
+
+        .nav-menu a:hover {
+            color: #0f8a5f;
+        }
+
+        .nav-auth {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            border-radius: 10px;
+            padding: 9px 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #c7d6e5;
+        }
+
+        .nav-btn-signup {
+            background: #0f8a5f;
+            border-color: #0f8a5f;
+            color: #fff;
+        }
+
+        .nav-btn-login {
+            background: #fff;
+            color: #21415e;
+        }
+
+        .hero {
+            width: 100%;
+            min-height: 400px;
+            background: linear-gradient(135deg, #113a5c, #176089);
+            color: #fff;
+            padding: 24px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-inner {
+            width: min(1050px, 100%);
+        }
+
         .container {
             max-width: 1050px;
             margin: 0 auto;
             padding: 28px 16px 40px;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #113a5c, #176089);
-            color: #fff;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
         }
 
         h1 { margin: 0 0 8px; font-size: 2rem; }
@@ -192,6 +272,14 @@
         }
 
         @media (max-width: 760px) {
+            .site-nav-inner {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .nav-menu, .nav-auth {
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
             .grid { grid-template-columns: 1fr; }
             h1 { font-size: 1.6rem; }
             .location-card { grid-template-columns: 1fr; }
@@ -199,15 +287,37 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <section class="hero">
+<nav class="site-nav">
+    <div class="site-nav-inner">
+        <a class="nav-logo" href="{{ route('home') }}">
+            <img src="{{ asset('logo') }}" alt="Gymmap logo">
+        </a>
+
+        <div class="nav-menu">
+            <a href="{{ route('home') }}">Home</a>
+            <a href="{{ route('gymbuddy.index') }}">Gymbuddy</a>
+            <a href="{{ route('listing-requests.create') }}">Locatie aanmelden</a>
+        </div>
+
+        <div class="nav-auth">
+            <a class="nav-btn nav-btn-signup" href="{{ route('listing-requests.create') }}">Aanmelden</a>
+            <a class="nav-btn nav-btn-login" href="{{ url('/login') }}">Inloggen</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-inner">
         <h1>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</h1>
         <p>Voer je adres, postcode of plaats in en klik op de zoekknop.</p>
         <div class="toolbar">
             <a class="btn btn-light" href="{{ route('listing-requests.create') }}">Locatie aanmelden (gratis)</a>
             <a class="btn btn-light" href="{{ route('gymbuddy.index') }}">Gymbuddy zoeken</a>
         </div>
-    </section>
+    </div>
+</section>
+
+<div class="container">
 
     @if(session('status'))
         <div class="flash">{{ session('status') }}</div>
