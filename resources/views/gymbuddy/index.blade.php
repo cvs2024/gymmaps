@@ -34,9 +34,10 @@
 <div class="container">
     <article class="card">
         <h1>Gymbuddy zoeken</h1>
-        <p class="muted">Plaats een bericht en vind iemand die met je wil trainen. Vul sport, dagen, locatie en voorkeuren in.</p>
+        <p class="muted">Bekijk alle actieve gymbuddy-berichten en reageer direct. Zelf ook een oproep plaatsen? Dat kan onderaan deze pagina.</p>
         <div class="row" style="margin-top:10px;">
             <a class="btn btn-ghost" href="{{ route('home') }}">Terug naar home</a>
+            <a class="btn btn-primary" href="#plaats-bericht">Zelf een bericht plaatsen</a>
         </div>
     </article>
 
@@ -45,6 +46,43 @@
     @endif
 
     <article class="card">
+        <h2 style="margin-top:0;">Actieve gymbuddy oproepen</h2>
+        <div class="posts">
+            @forelse($posts as $post)
+                <div class="card" style="margin-bottom:0;">
+                    <p class="post-title">{{ $post->name }} zoekt een gymbuddy voor {{ $post->sport }}</p>
+                    <p class="meta">Locatie: {{ $post->address ? $post->address . ', ' : '' }}{{ $post->postcode ? $post->postcode . ' ' : '' }}{{ $post->city }}</p>
+                    <p class="meta">Trainingsfrequentie: {{ $post->days_per_week }} · Voorkeur: {{ str_replace('_', ' ', $post->gender_preference ?? 'geen voorkeur') }}</p>
+                    <p class="meta"><strong>Over mij:</strong> {{ $post->about_you }}</p>
+                    <p class="meta"><strong>Zoekopdracht:</strong> {{ $post->search_message }}</p>
+                    <span class="badge">Geplaatst op {{ $post->created_at->format('d-m-Y') }}</span>
+                    <div style="margin-top:10px;">
+                        <a class="btn btn-primary" href="mailto:{{ $post->email }}?subject={{ rawurlencode('Reactie op jouw gymbuddy oproep') }}">Reageer op dit bericht</a>
+                    </div>
+                </div>
+            @empty
+                <p class="muted">Nog geen oproepen geplaatst.</p>
+            @endforelse
+        </div>
+
+        @if($posts->lastPage() > 1)
+            <div class="pager" style="margin-top:12px;">
+                @if($posts->onFirstPage())
+                    <span class="disabled">Vorige</span>
+                @else
+                    <a href="{{ $posts->previousPageUrl() }}">Vorige</a>
+                @endif
+                <span>Pagina {{ $posts->currentPage() }} / {{ $posts->lastPage() }}</span>
+                @if($posts->hasMorePages())
+                    <a href="{{ $posts->nextPageUrl() }}">Volgende</a>
+                @else
+                    <span class="disabled">Volgende</span>
+                @endif
+            </div>
+        @endif
+    </article>
+
+    <article class="card" id="plaats-bericht">
         <h2 style="margin-top:0;">Plaats jouw oproep</h2>
         <form method="POST" action="{{ route('gymbuddy.store') }}">
             @csrf
@@ -125,43 +163,6 @@
 
             <button class="btn btn-primary" type="submit">Plaats oproep</button>
         </form>
-    </article>
-
-    <article class="card">
-        <h2 style="margin-top:0;">Actieve gymbuddy oproepen</h2>
-        <div class="posts">
-            @forelse($posts as $post)
-                <div class="card" style="margin-bottom:0;">
-                    <p class="post-title">{{ $post->name }} zoekt een gymbuddy voor {{ $post->sport }}</p>
-                    <p class="meta">Locatie: {{ $post->address ? $post->address . ', ' : '' }}{{ $post->postcode ? $post->postcode . ' ' : '' }}{{ $post->city }}</p>
-                    <p class="meta">Trainingsfrequentie: {{ $post->days_per_week }} · Voorkeur: {{ str_replace('_', ' ', $post->gender_preference ?? 'geen voorkeur') }}</p>
-                    <p class="meta"><strong>Over mij:</strong> {{ $post->about_you }}</p>
-                    <p class="meta"><strong>Zoekopdracht:</strong> {{ $post->search_message }}</p>
-                    <span class="badge">Geplaatst op {{ $post->created_at->format('d-m-Y') }}</span>
-                    <div style="margin-top:10px;">
-                        <a class="btn btn-primary" href="mailto:{{ $post->email }}?subject={{ rawurlencode('Reactie op jouw gymbuddy oproep') }}">Reageer op dit bericht</a>
-                    </div>
-                </div>
-            @empty
-                <p class="muted">Nog geen oproepen geplaatst.</p>
-            @endforelse
-        </div>
-
-        @if($posts->lastPage() > 1)
-            <div class="pager" style="margin-top:12px;">
-                @if($posts->onFirstPage())
-                    <span class="disabled">Vorige</span>
-                @else
-                    <a href="{{ $posts->previousPageUrl() }}">Vorige</a>
-                @endif
-                <span>Pagina {{ $posts->currentPage() }} / {{ $posts->lastPage() }}</span>
-                @if($posts->hasMorePages())
-                    <a href="{{ $posts->nextPageUrl() }}">Volgende</a>
-                @else
-                    <span class="disabled">Volgende</span>
-                @endif
-            </div>
-        @endif
     </article>
 </div>
 </body>
