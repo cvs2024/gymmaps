@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Import Monitor - Gymmap</title>
+    <style>
+        body { margin:0; font-family: "Segoe UI", Roboto, sans-serif; background:#f5f8fc; color:#0e2235; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; }
+        .card { background:#fff; border:1px solid #d6e1ec; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        h1 { margin:0 0 8px; }
+        .muted { color:#5d6f82; }
+        .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        select, button { border:1px solid #bfd0e1; border-radius:8px; padding:8px 10px; font:inherit; }
+        button { background:#0f8a5f; color:#fff; border:none; cursor:pointer; }
+        table { width:100%; border-collapse: collapse; font-size: 0.92rem; }
+        th, td { text-align:left; padding:10px; border-bottom:1px solid #e6edf5; vertical-align:top; }
+        th { color:#44596e; }
+        .pill { display:inline-block; border-radius:999px; padding:3px 8px; font-size:0.78rem; }
+        .pill.pending { background:#fff5d9; color:#7f6300; }
+        .pill.processed { background:#e8f7f0; color:#176647; }
+        .pill.failed { background:#ffe8e8; color:#8b1e1e; }
+        .pill.skipped { background:#eef0f3; color:#516172; }
+        code { background:#f2f6fb; padding:2px 5px; border-radius:6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>Import Monitor</h1>
+        <p class="muted">Overzicht van KVK-imports, inclusief foutmeldingen en verwerkingsstatus.</p>
+        <form method="GET" class="toolbar">
+            <label for="status">Status</label>
+            <select name="status" id="status">
+                <option value="all" @selected($status === 'all')>Alle</option>
+                <option value="pending" @selected($status === 'pending')>Pending</option>
+                <option value="processed" @selected($status === 'processed')>Processed</option>
+                <option value="failed" @selected($status === 'failed')>Failed</option>
+                <option value="skipped" @selected($status === 'skipped')>Skipped</option>
+            </select>
+            <button type="submit">Filter</button>
+            <span class="muted">Totaal: {{ $rawImports->total() }}</span>
+        </form>
+    </div>
+
+    <div class="card" style="overflow:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Source</th>
+                    <th>External ID</th>
+                    <th>Status</th>
+                    <th>Fout</th>
+                    <th>Processed</th>
+                    <th>Aangemaakt</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($rawImports as $row)
+                    <tr>
+                        <td>{{ $row->id }}</td>
+                        <td><code>{{ $row->source }}</code></td>
+                        <td>{{ $row->external_id ?: '-' }}</td>
+                        <td><span class="pill {{ $row->status }}">{{ $row->status }}</span></td>
+                        <td class="muted">{{ $row->error_message ?: '-' }}</td>
+                        <td class="muted">{{ optional($row->processed_at)->format('Y-m-d H:i:s') ?: '-' }}</td>
+                        <td class="muted">{{ $row->created_at->format('Y-m-d H:i:s') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="muted">Geen importregels gevonden.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="muted">
+        {{ $rawImports->links() }}
+    </div>
+</div>
+</body>
+</html>
