@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\GymbuddyPost;
-use App\Models\Sport;
 use Illuminate\Http\Request;
 
 class GymbuddyPostController extends Controller
@@ -11,7 +10,6 @@ class GymbuddyPostController extends Controller
     public function index()
     {
         return view('gymbuddy.index', [
-            'sports' => Sport::query()->orderBy('name')->get(),
             'posts' => GymbuddyPost::query()
                 ->where('is_active', true)
                 ->latest()

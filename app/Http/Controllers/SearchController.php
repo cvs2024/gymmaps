@@ -4,12 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use App\Models\Sport;
+use App\Services\GoogleGeocodingService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-    public function index(Request $request)
+    public function suggestions(Request $request)
+    {
+        $term = trim((string) $request->query('q', ''));
+        $limit = max(4, min(12, (int) $request->integer('limit', 8)));
+
+        if ($term === '') {
+            return response()->json(['items' => []]);
+        }
+
+        $baseQuery = Location::query()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude');
+
+        $hasKvk = (clone $baseQuery)
+            ->where('source', 'kvk')
+            ->exists();
+
+        if ($hasKvk) {
+            $baseQuery->where('source', 'kvk');
+        }
+
+        $postcode = $this->collectSuggestions($baseQuery, 'postcode', $term, 4, 'postcode');
+        $city = $this->collectSuggestions($baseQuery, 'city', $term, 4, 'plaats');
+        $address = $this->collectSuggestions($baseQuery, 'address', $term, 4, 'adres');
+        $name = $this->collectSuggestions($baseQuery, 'name', $term, 4, 'locatie');
+
+        $items = collect([...$postcode, ...$city, ...$address, ...$name])
+            ->unique(fn (array $item) => mb_strtolower(trim($item['value'])))
+            ->take($limit)
+            ->values()
+            ->all();
+
+        return response()->json(['items' => $items]);
+    }
+
+    public function index(Request $request, GoogleGeocodingService $geocodingService)
     {
         $sports = Sport::query()->orderBy('name')->get();
 
@@ -23,26 +59,65 @@ class SearchController extends Controller
         $radius = in_array($radius, [5, 10, 20, 50, 250], true) ? $radius : 10;
 
         $center = null;
+        $googleMapsKey = (string) config('services.google_maps.key');
         if ($query !== '') {
-            $center = Location::query()
-                ->where('postcode', 'like', "%{$query}%")
-                ->orWhere('city', 'like', "%{$query}%")
-                ->orWhere('address', 'like', "%{$query}%")
-                ->orWhere('name', 'like', "%{$query}%")
-                ->first();
+            $geo = $geocodingService->geocode($query . ', Nederland');
+            if ($geo) {
+                $center = (object) [
+                    'latitude' => $geo['latitude'],
+                    'longitude' => $geo['longitude'],
+                    'city' => $query,
+                    'postcode' => '',
+                ];
+            }
+
+            if (!$center) {
+                $center = Location::query()
+                    ->where('source', 'kvk')
+                    ->whereNotNull('latitude')
+                    ->whereNotNull('longitude')
+                    ->where(function ($subQuery) use ($query) {
+                        $subQuery->where('postcode', 'like', "%{$query}%")
+                            ->orWhere('city', 'like', "%{$query}%")
+                            ->orWhere('address', 'like', "%{$query}%")
+                            ->orWhere('name', 'like', "%{$query}%");
+                    })
+                    ->first();
+            }
         }
 
         $locationsQuery = Location::query()
             ->with('sports')
+            ->where('source', 'kvk')
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
             ->when($selectedSports->isNotEmpty(), function ($q) use ($selectedSports) {
                 $q->whereHas('sports', function ($sportQuery) use ($selectedSports) {
                     $sportQuery->whereIn('sports.id', $selectedSports);
                 });
             });
+        $totalKvkLocations = Location::query()
+            ->where('source', 'kvk')
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->count();
+        $isUsingFallbackSource = false;
+
+        if ($totalKvkLocations === 0) {
+            $isUsingFallbackSource = true;
+            $locationsQuery = Location::query()
+                ->with('sports')
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->when($selectedSports->isNotEmpty(), function ($q) use ($selectedSports) {
+                    $q->whereHas('sports', function ($sportQuery) use ($selectedSports) {
+                        $sportQuery->whereIn('sports.id', $selectedSports);
+                    });
+                });
+        }
 
         $results = collect();
         $paginatedResults = null;
-        $googleMapsKey = (string) config('services.google_maps.key');
         if ($center) {
             $results = (clone $locationsQuery)
                 ->get()
@@ -61,33 +136,48 @@ class SearchController extends Controller
                 ->sortBy('distance_km')
                 ->map(function (Location $location) use ($googleMapsKey) {
                     $location->display_photo_url = $this->resolvePhotoUrl($location, $googleMapsKey);
+                    $location->display_logo_url = $this->resolveLogoUrl($location);
 
                     return $location;
                 })
                 ->values();
+        } else {
+            $results = (clone $locationsQuery)
+                ->when($query !== '', function ($q) use ($query) {
+                    $q->where(function ($subQuery) use ($query) {
+                        $subQuery->where('postcode', 'like', "%{$query}%")
+                            ->orWhere('city', 'like', "%{$query}%")
+                            ->orWhere('address', 'like', "%{$query}%")
+                            ->orWhere('name', 'like', "%{$query}%");
+                    });
+                })
+                ->orderBy('city')
+                ->orderBy('name')
+                ->get()
+                ->map(function (Location $location) use ($googleMapsKey) {
+                    $location->distance_km = null;
+                    $location->display_photo_url = $this->resolvePhotoUrl($location, $googleMapsKey);
+                    $location->display_logo_url = $this->resolveLogoUrl($location);
 
-            $perPage = 20;
-            $page = max(1, (int) $request->integer('page', 1));
-            $paginatedResults = new LengthAwarePaginator(
-                $results->forPage($page, $perPage)->values(),
-                $results->count(),
-                $perPage,
-                $page,
-                [
-                    'path' => $request->url(),
-                    'query' => $request->query(),
-                ]
-            );
+                    return $location;
+                })
+                ->values();
         }
 
-        $locationsForMap = $center
-            ? $results
-            : (clone $locationsQuery)->orderBy('city')->get()->map(function (Location $location) use ($googleMapsKey) {
-                $location->distance_km = null;
-                $location->display_photo_url = $this->resolvePhotoUrl($location, $googleMapsKey);
+        $perPage = 20;
+        $page = max(1, (int) $request->integer('page', 1));
+        $paginatedResults = new LengthAwarePaginator(
+            $results->forPage($page, $perPage)->values(),
+            $results->count(),
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
 
-                return $location;
-            });
+        $locationsForMap = $results;
 
         $mapLocations = $locationsForMap->map(function (Location $location) {
             return [
@@ -97,7 +187,9 @@ class SearchController extends Controller
                 'lng' => (float) $location->longitude,
                 'distance' => $location->distance_km !== null ? (float) $location->distance_km : null,
                 'photo_url' => $location->display_photo_url,
+                'logo_url' => $location->display_logo_url,
                 'detail_url' => route('locations.show', $location),
+                'sports' => $location->sports->pluck('name')->values()->all(),
             ];
         })->values()->all();
 
@@ -115,6 +207,8 @@ class SearchController extends Controller
             'hasSearchCenter' => $center !== null,
             'googleMapsKey' => $googleMapsKey,
             'mapLocations' => $mapLocations,
+            'totalKvkLocations' => $totalKvkLocations,
+            'isUsingFallbackSource' => $isUsingFallbackSource,
         ]);
     }
 
@@ -133,6 +227,29 @@ class SearchController extends Controller
         }
 
         return 'https://placehold.co/640x360/eaf1f7/587089?text=Geen+foto';
+    }
+
+    private function resolveLogoUrl(Location $location): ?string
+    {
+        if (is_string($location->logo_url) && trim($location->logo_url) !== '') {
+            return trim($location->logo_url);
+        }
+
+        if (!is_string($location->website) || trim($location->website) === '') {
+            return null;
+        }
+
+        $website = trim($location->website);
+        if (!str_starts_with($website, 'http://') && !str_starts_with($website, 'https://')) {
+            $website = 'https://'.$website;
+        }
+
+        $host = parse_url($website, PHP_URL_HOST);
+        if (!is_string($host) || trim($host) === '') {
+            return null;
+        }
+
+        return 'https://www.google.com/s2/favicons?domain='.rawurlencode($host).'&sz=256';
     }
 
     private function mapZoomForRadius(int $radius): int
@@ -164,5 +281,43 @@ class SearchController extends Controller
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return $earthRadiusKm * $c;
+    }
+
+    private function collectSuggestions($baseQuery, string $column, string $term, int $max, string $type): array
+    {
+        $startsWith = (clone $baseQuery)
+            ->where($column, 'like', $term.'%')
+            ->where($column, '!=', '')
+            ->distinct()
+            ->limit($max)
+            ->pluck($column)
+            ->map(fn ($value) => trim((string) $value))
+            ->filter()
+            ->values();
+
+        $remaining = max(0, $max - $startsWith->count());
+        $contains = collect();
+        if ($remaining > 0) {
+            $contains = (clone $baseQuery)
+                ->where($column, 'like', '%'.$term.'%')
+                ->where($column, 'not like', $term.'%')
+                ->where($column, '!=', '')
+                ->distinct()
+                ->limit($remaining)
+                ->pluck($column)
+                ->map(fn ($value) => trim((string) $value))
+                ->filter()
+                ->values();
+        }
+
+        return $startsWith
+            ->concat($contains)
+            ->map(fn (string $value) => [
+                'value' => $value,
+                'type' => $type,
+                'label' => $value.' ('.$type.')',
+            ])
+            ->values()
+            ->all();
     }
 }

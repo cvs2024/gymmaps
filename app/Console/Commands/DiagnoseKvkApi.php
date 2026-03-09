@@ -55,12 +55,12 @@ class DiagnoseKvkApi extends Command
         }
 
         $this->newLine();
-        $this->line("2) Test zoeken endpoint met handelsnaam=\"{$query}\"");
+        $this->line("2) Test zoeken endpoint v2 met naam=\"{$query}\"");
         try {
             $response = $kvkApiService->search([
-                'handelsnaam' => $query,
+                'naam' => $query,
                 'pagina' => 1,
-                'aantal' => 5,
+                'resultatenPerPagina' => 5,
             ]);
             $this->info('Zoeken success.');
             $this->line('Top-level keys: '.implode(', ', array_keys($response)));
@@ -69,17 +69,17 @@ class DiagnoseKvkApi extends Command
         }
 
         $this->newLine();
-        $this->line('3) Directe ruwe call (zonder service) naar /api/v1/zoeken');
+        $this->line('3) Directe ruwe call (zonder service) naar /api/v2/zoeken');
         try {
             $raw = Http::timeout(10)
                 ->acceptJson()
                 ->withHeaders([
                     (string) config('services.kvk.key_header', 'apikey') => $apiKey,
                 ])
-                ->get('https://api.kvk.nl/api/v1/zoeken', [
-                    'handelsnaam' => $query,
+                ->get('https://api.kvk.nl/api/v2/zoeken', [
+                    'naam' => $query,
                     'pagina' => 1,
-                    'aantal' => 5,
+                    'resultatenPerPagina' => 5,
                 ]);
 
             $this->line('HTTP status: '.$raw->status());

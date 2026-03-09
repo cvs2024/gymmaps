@@ -15,7 +15,12 @@ class KvkApiService
 
     public function search(array $query = []): array
     {
-        return $this->request($this->buildPath('v1/zoeken'), $query);
+        return $this->request($this->buildPath('v2/zoeken'), $query);
+    }
+
+    public function getVestigingsprofiel(string $vestigingsnummer): array
+    {
+        return $this->request($this->buildPath('v1/vestigingsprofielen/' . urlencode($vestigingsnummer)));
     }
 
     private function request(string $path, array $query = []): array
@@ -31,6 +36,7 @@ class KvkApiService
 
         /** @var Response $response */
         $response = Http::timeout($timeout)
+            ->retry(2, 400)
             ->acceptJson()
             ->withHeaders([$keyHeader => $apiKey])
             ->get($baseUrl . $path, $query);

@@ -26,6 +26,7 @@ class ListingRequestController extends Controller
             'sports_overview' => ['required', 'string', 'max:500'],
             'message' => ['nullable', 'string', 'max:2000'],
             'photo' => ['nullable', 'image', 'max:5120'],
+            'logo_url' => ['nullable', 'url', 'max:5000'],
         ]);
 
         if ($request->hasFile('photo')) {

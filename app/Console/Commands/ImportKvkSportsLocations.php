@@ -5,8 +5,10 @@ namespace App\Console\Commands;
 use App\Models\RawImport;
 use App\Models\Sport;
 use App\Services\GoogleGeocodingService;
+use App\Services\GooglePlacesPhotoService;
 use App\Services\KvkApiService;
 use App\Services\LocationUpsertService;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 
@@ -20,8 +22,10 @@ class ImportKvkSportsLocations extends Command
     protected $signature = 'gymmap:import-kvk-sports
                             {--query=* : Zoektermen voor KVK, mag meerdere keren}
                             {--page=1 : Startpagina}
-                            {--pages=3 : Aantal pagina\'s per zoekterm}
+                            {--pages=0 : Aantal pagina\'s per zoekterm (0 = doorlopen tot lege pagina)}
                             {--per-page=100 : Aantal resultaten per pagina}
+                            {--max-pages=250 : Veiligheidslimiet bij pages=0}
+                            {--max-failures=12 : Stop na dit aantal opeenvolgende API-fouten per zoekterm}
                             {--dry-run : Alleen ophalen en in raw_imports zetten}';
 
     /**
@@ -37,25 +41,34 @@ class ImportKvkSportsLocations extends Command
     public function handle(
         KvkApiService $kvkApiService,
         GoogleGeocodingService $geocodingService,
+        GooglePlacesPhotoService $photoService,
         LocationUpsertService $locationUpsertService
     ): int
     {
         $queries = $this->option('query');
         if (!is_array($queries) || $queries === []) {
             $queries = [
+                'sport',
                 'sportschool',
                 'fitness',
+                'gym',
+                'personal training',
                 'yoga studio',
                 'crossfit',
                 'boksschool',
+                'kickboksen',
                 'tennis vereniging',
                 'squash',
+                'sportvereniging',
+                'sportclub',
             ];
         }
 
         $startPage = max(1, (int) $this->option('page'));
-        $pages = max(1, (int) $this->option('pages'));
+        $pages = max(0, (int) $this->option('pages'));
         $perPage = max(1, min(100, (int) $this->option('per-page')));
+        $maxPages = max(1, (int) $this->option('max-pages'));
+        $maxFailures = max(1, (int) $this->option('max-failures'));
         $dryRun = (bool) $this->option('dry-run');
 
         $this->ensureSportsExist();
@@ -65,23 +78,56 @@ class ImportKvkSportsLocations extends Command
         $skippedCount = 0;
 
         foreach ($queries as $query) {
-            for ($page = $startPage; $page < ($startPage + $pages); $page++) {
+            $page = $startPage;
+            $processedPages = 0;
+            $consecutiveFailures = 0;
+
+            while (true) {
+                if ($pages > 0 && $processedPages >= $pages) {
+                    break;
+                }
+
+                if ($pages === 0 && $processedPages >= $maxPages) {
+                    $this->warn("Stop voor query \"{$query}\": max-pages ({$maxPages}) bereikt.");
+                    break;
+                }
+
                 $this->line("Ophalen: query=\"{$query}\", pagina={$page}");
 
                 try {
                     $payload = $kvkApiService->search([
-                        'handelsnaam' => $query,
+                        'naam' => $query,
                         'pagina' => $page,
-                        'aantal' => $perPage,
+                        'resultatenPerPagina' => $perPage,
                     ]);
+                    $consecutiveFailures = 0;
                 } catch (\Throwable $e) {
+                    if ($this->isNoResultsError($e)) {
+                        $this->line("Geen extra resultaten voor query \"{$query}\" vanaf pagina {$page}.");
+                        break;
+                    }
+
                     $this->warn("KVK call mislukt voor query '{$query}' pagina {$page}: {$e->getMessage()}");
+                    $consecutiveFailures++;
+                    if ($consecutiveFailures >= $maxFailures) {
+                        $this->warn("Stop voor query \"{$query}\": {$consecutiveFailures} opeenvolgende API-fouten.");
+                        break;
+                    }
+                    usleep(350000);
+                    $page++;
+                    $processedPages++;
                     continue;
                 }
 
                 $records = $this->extractRecords($payload);
                 if ($records === []) {
                     $this->line('Geen records op deze pagina.');
+                    if ($pages === 0) {
+                        break;
+                    }
+
+                    $page++;
+                    $processedPages++;
                     continue;
                 }
 
@@ -94,7 +140,7 @@ class ImportKvkSportsLocations extends Command
                     }
 
                     try {
-                        $normalized = $this->normalizeRecord($record, $query, $geocodingService);
+                        $normalized = $this->normalizeRecord($record, $query, $geocodingService, $kvkApiService, $photoService);
 
                         if ($normalized === null) {
                             $rawImport->update([
@@ -123,6 +169,9 @@ class ImportKvkSportsLocations extends Command
                         $skippedCount++;
                     }
                 }
+
+                $page++;
+                $processedPages++;
             }
         }
 
@@ -138,11 +187,13 @@ class ImportKvkSportsLocations extends Command
     {
         $sports = [
             ['name' => 'Fitness', 'slug' => 'fitness'],
+            ['name' => 'Personal trainer', 'slug' => 'personal-trainer'],
             ['name' => 'Yoga', 'slug' => 'yoga'],
             ['name' => 'Boksen', 'slug' => 'boksen'],
             ['name' => 'CrossFit', 'slug' => 'crossfit'],
             ['name' => 'Tennis', 'slug' => 'tennis'],
             ['name' => 'Squash', 'slug' => 'squash'],
+            ['name' => 'Padel', 'slug' => 'padel'],
         ];
 
         foreach ($sports as $sport) {
@@ -199,16 +250,27 @@ class ImportKvkSportsLocations extends Command
     private function normalizeRecord(
         array $record,
         string $query,
-        GoogleGeocodingService $geocodingService
+        GoogleGeocodingService $geocodingService,
+        KvkApiService $kvkApiService,
+        GooglePlacesPhotoService $photoService
     ): ?array {
+        $detail = $this->resolveVestigingDetail($record, $kvkApiService);
+
         $name = $this->firstString($record, [
             'naam',
             'handelsnaam',
             'organisatie.naam',
             'bedrijf.naam',
         ]);
+        if ($name === null) {
+            $name = $this->firstString($detail, [
+                'eersteHandelsnaam',
+                'statutaireNaam',
+            ]);
+        }
 
         $street = $this->firstString($record, [
+            'adres.binnenlandsAdres.straatnaam',
             'adres.straatnaam',
             'straatnaam',
             'straat',
@@ -226,16 +288,34 @@ class ImportKvkSportsLocations extends Command
             'bezoekadres.huisnummertoevoeging',
         ]);
         $postcode = $this->firstString($record, [
+            'adres.binnenlandsAdres.postcode',
             'adres.postcode',
             'postcode',
             'bezoekadres.postcode',
         ]);
         $city = $this->firstString($record, [
+            'adres.binnenlandsAdres.plaats',
             'adres.plaats',
             'plaats',
             'bezoekadres.plaats',
             'woonplaats',
         ]);
+
+        if ($street === null) {
+            $street = $this->firstString($detail, ['adressen.0.straatnaam', 'adressen.1.straatnaam']);
+        }
+        if ($houseNumber === null) {
+            $houseNumber = $this->firstString($detail, ['adressen.0.huisnummer', 'adressen.1.huisnummer']);
+        }
+        if ($houseNumberSuffix === null) {
+            $houseNumberSuffix = $this->firstString($detail, ['adressen.0.huisnummerToevoeging', 'adressen.1.huisnummerToevoeging']);
+        }
+        if ($postcode === null) {
+            $postcode = $this->firstString($detail, ['adressen.0.postcode', 'adressen.1.postcode']);
+        }
+        if ($city === null) {
+            $city = $this->firstString($detail, ['adressen.0.plaats', 'adressen.1.plaats']);
+        }
 
         if ($name === null || $street === null || $postcode === null || $city === null) {
             return null;
@@ -255,6 +335,19 @@ class ImportKvkSportsLocations extends Command
             'geo.lng',
             'longitude',
         ]);
+
+        if ($latitude === null || $longitude === null) {
+            $latitude = $this->firstFloat($detail, [
+                'adressen.0.coordinaten.lat',
+                'adressen.1.coordinaten.lat',
+            ]) ?? $latitude;
+            $longitude = $this->firstFloat($detail, [
+                'adressen.0.coordinaten.lon',
+                'adressen.0.coordinaten.lng',
+                'adressen.1.coordinaten.lon',
+                'adressen.1.coordinaten.lng',
+            ]) ?? $longitude;
+        }
 
         if ($latitude === null || $longitude === null) {
             $geo = $geocodingService->geocode("{$address}, {$postcode} {$city}, Nederland");
@@ -279,10 +372,14 @@ class ImportKvkSportsLocations extends Command
             'contact.website',
         ]);
         $externalId = $this->firstString($record, [
+            'vestigingsnummer',
             'kvkNummer',
             'kvknummer',
             'kvk_nummer',
         ]);
+        if ($externalId === null) {
+            $externalId = $this->firstString($detail, ['vestigingsnummer', 'kvkNummer']);
+        }
 
         $textForClassification = mb_strtolower(
             implode(' ', [
@@ -291,7 +388,17 @@ class ImportKvkSportsLocations extends Command
                 (string) ($record['omschrijving'] ?? ''),
                 (string) ($record['activiteiten'] ?? ''),
                 (string) ($record['sbiOmschrijving'] ?? ''),
+                $this->extractSbiText($detail),
             ])
+        );
+
+        $photoUrl = $photoService->findPhotoUrl(
+            $name,
+            $address,
+            $postcode,
+            $city,
+            $latitude,
+            $longitude
         );
 
         return [
@@ -303,7 +410,7 @@ class ImportKvkSportsLocations extends Command
             'longitude' => $longitude,
             'website' => $website,
             'phone' => $phone,
-            'photo_url' => null,
+            'photo_url' => $photoUrl,
             'source' => 'kvk',
             'external_id' => $externalId,
             'sport_slugs' => $this->mapSports($textForClassification),
@@ -313,12 +420,14 @@ class ImportKvkSportsLocations extends Command
     private function mapSports(string $text): array
     {
         $map = [
-            'fitness' => ['fitness', 'sportschool', 'gym'],
+            'personal-trainer' => ['personal trainer', 'personaltraining', 'pt studio', 'pt-studio', 'coach'],
+            'fitness' => ['fitness', 'sportschool', 'gym', 'krachttraining', 'kracht train'],
             'yoga' => ['yoga', 'pilates'],
-            'boksen' => ['boksen', 'boks', 'kickbok'],
+            'boksen' => ['boksen', 'boks', 'kickbok', 'boxing', 'vechtsport'],
             'crossfit' => ['crossfit'],
             'tennis' => ['tennis'],
             'squash' => ['squash'],
+            'padel' => ['padel'],
         ];
 
         $found = [];
@@ -332,6 +441,39 @@ class ImportKvkSportsLocations extends Command
         }
 
         return $found !== [] ? array_values(array_unique($found)) : ['fitness'];
+    }
+
+    private function extractSbiText(array $detail): string
+    {
+        $items = Arr::get($detail, 'sbiActiviteiten', []);
+        if (!is_array($items) || $items === []) {
+            return '';
+        }
+
+        return collect($items)
+            ->map(function ($item) {
+                if (!is_array($item)) {
+                    return '';
+                }
+
+                return trim((string) ($item['sbiOmschrijving'] ?? ''));
+            })
+            ->filter()
+            ->implode(' ');
+    }
+
+    private function resolveVestigingDetail(array $record, KvkApiService $kvkApiService): array
+    {
+        $vestigingsnummer = $this->firstString($record, ['vestigingsnummer', 'vestigingNummer']);
+        if ($vestigingsnummer === null) {
+            return [];
+        }
+
+        try {
+            return $kvkApiService->getVestigingsprofiel($vestigingsnummer);
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     private function firstString(array $record, array $paths): ?string
@@ -359,5 +501,40 @@ class ImportKvkSportsLocations extends Command
         }
 
         return null;
+    }
+
+    private function isNoResultsError(\Throwable $e): bool
+    {
+        if (!$e instanceof RequestException) {
+            return false;
+        }
+
+        $response = $e->response;
+        if (!$response || $response->status() !== 404) {
+            return false;
+        }
+
+        $payload = $response->json();
+        if (!is_array($payload)) {
+            return false;
+        }
+
+        $errors = Arr::get($payload, 'fout', []);
+        if (!is_array($errors)) {
+            return false;
+        }
+
+        foreach ($errors as $error) {
+            if (!is_array($error)) {
+                continue;
+            }
+
+            $code = (string) ($error['code'] ?? '');
+            if ($code === 'IPD5200') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

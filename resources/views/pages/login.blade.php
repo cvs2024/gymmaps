@@ -3,15 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gratis sportlocatie aanmelden - Gymmap.nl</title>
+    <title>Meld jouw sportlocatie aan op GymMaps.nl</title>
     <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    <meta name="description" content="Maak een bedrijfsprofiel aan op GymMaps.nl en word zichtbaar voor sporters in jouw regio.">
     <style>
         :root {
             --blue-900: #0f3f73;
             --blue-700: #1f5e9a;
             --ink: #11395f;
-            --muted: #5c7289;
+            --muted: #4f6781;
             --line: #d6e2ee;
             --card: #f9fbfe;
             --field: #f4f8fc;
@@ -33,82 +34,62 @@
         }
 
         .container {
-            max-width: 860px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 42px 16px 50px;
+            padding: 40px 16px 56px;
         }
 
         .panel {
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(247, 250, 254, 0.96));
             border: 1px solid rgba(202, 218, 234, 0.9);
             border-radius: 30px;
-            padding: 24px;
+            padding: 26px;
             box-shadow: 0 26px 60px rgba(9, 35, 61, 0.34);
         }
 
         h1 {
-            margin: 0 0 8px;
-            font-size: clamp(1.9rem, 3vw, 2.45rem);
+            margin: 0 0 12px;
+            font-size: clamp(1.9rem, 3vw, 2.5rem);
             color: #123f6a;
             text-align: center;
         }
 
-        .muted {
-            color: var(--muted);
-            margin: 0 0 18px;
-            text-align: center;
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 18px;
-            position: relative;
-        }
-
-        .steps::before {
-            content: "";
-            position: absolute;
-            left: 8%;
-            right: 8%;
-            top: 20px;
-            height: 3px;
-            background: #d2dfeb;
-            border-radius: 999px;
-            z-index: 0;
-        }
-
-        .step {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            color: #668097;
-            font-weight: 600;
-        }
-
-        .step-dot {
-            width: 42px;
-            height: 42px;
-            margin: 0 auto 8px;
-            border-radius: 50%;
-            border: 2px solid #bed0e3;
-            background: #ecf3fa;
-            display: grid;
-            place-items: center;
+        h2 {
+            margin: 22px 0 10px;
             font-size: 1.35rem;
-            font-weight: 700;
+            color: #123f6a;
         }
 
-        .step.active {
-            color: #4a8f19;
+        p {
+            margin: 0 0 12px;
+            color: var(--muted);
+            line-height: 1.55;
         }
 
-        .step.active .step-dot {
-            border-color: var(--green);
-            background: var(--green);
-            color: #fff;
-            box-shadow: 0 8px 16px rgba(126, 166, 26, 0.34);
+        .benefits {
+            list-style: none;
+            margin: 8px 0 20px;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .benefits li {
+            color: #1d4367;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .benefits li::before {
+            content: "";
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            border-radius: 4px;
+            border: 2px solid #98c524;
+            background: rgba(149, 193, 31, 0.15);
+            flex: 0 0 16px;
         }
 
         .form-card {
@@ -117,6 +98,13 @@
             border-radius: 22px;
             padding: 24px 26px;
             box-shadow: 0 16px 30px rgba(20, 55, 89, 0.08);
+            margin-top: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         .field { margin-bottom: 12px; }
@@ -136,12 +124,6 @@
             font: inherit;
             background: var(--field);
             color: #183b5d;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
         }
 
         .error { color: #9d1f1f; font-size: 0.9rem; margin-top: 4px; }
@@ -178,7 +160,7 @@
             color: #1e4b75;
         }
 
-        @media (max-width: 680px) {
+        @media (max-width: 760px) {
             .grid { grid-template-columns: 1fr; }
             .form-card { padding: 16px; }
             .actions { justify-content: flex-start; }
@@ -189,24 +171,26 @@
 <body>
 @include('partials.site-header')
 <div class="container">
-    <div class="panel">
-        <h1>Sportlocatie gratis aanmelden</h1>
-        <p class="muted">Staat jouw sportschool of sportactiviteit nog niet op GymMaps.nl? Vul dit formulier in. De aanmelding is kosteloos.</p>
+    <section class="panel">
+        <h1>Meld jouw sportlocatie aan op GymMaps.nl</h1>
+        <p>
+            Heb jij een sportschool, personal training studio of bied je sportactiviteiten aan in Nederland?
+            Maak dan eenvoudig een bedrijfsprofiel op GymMaps.nl en word zichtbaar voor sporters in jouw regio.
+            GymMaps.nl helpt sporters om sportlocaties, trainers en activiteiten in de buurt te vinden via een overzichtelijke kaart en handige filters.
+            Door een profiel aan te maken zorg je ervoor dat potentiële sporters jouw locatie snel kunnen ontdekken.
+        </p>
 
-        <div class="steps" aria-hidden="true">
-            <div class="step active">
-                <div class="step-dot">1</div>
-                Basisinfo
-            </div>
-            <div class="step">
-                <div class="step-dot">2</div>
-                Locatie
-            </div>
-            <div class="step">
-                <div class="step-dot">3</div>
-                Details
-            </div>
-        </div>
+        <h2>Wat kun je met een bedrijfsprofiel?</h2>
+        <p>Met een bedrijfsaccount kun je jouw sportlocatie volledig zelf beheren. Je kunt onder andere:</p>
+        <ul class="benefits">
+            <li>jouw sportlocatie op de kaart tonen</li>
+            <li>een introductie of beschrijving van je bedrijf toevoegen</li>
+            <li>foto’s van je locatie of trainingen uploaden</li>
+            <li>een link naar je website, boekingssysteem of social media plaatsen</li>
+            <li>je profiel altijd zelf aanpassen of updaten</li>
+        </ul>
+
+        <h2>Start vandaag nog met jouw bedrijfsprofiel</h2>
 
         <div class="form-card">
             <form method="POST" action="{{ route('listing-requests.store') }}" enctype="multipart/form-data">
@@ -271,7 +255,7 @@
 
                 <div class="field">
                     <label for="sports_overview">Welke sportactiviteiten bied je aan?</label>
-                    <input id="sports_overview" name="sports_overview" type="text" value="{{ old('sports_overview') }}" placeholder="Bijv. fitness, yoga, boksen" required>
+                    <input id="sports_overview" name="sports_overview" type="text" value="{{ old('sports_overview') }}" placeholder="Bijv. fitness, personal training, boksen" required>
                     @error('sports_overview')<div class="error">{{ $message }}</div>@enderror
                 </div>
 
@@ -282,19 +266,18 @@
                 </div>
 
                 <div class="field">
-                    <label for="photo">Foto van de sportschool (optioneel)</label>
+                    <label for="photo">Foto van de locatie (optioneel)</label>
                     <input id="photo" name="photo" type="file" accept="image/*">
-                    <p class="muted" style="margin: 4px 0 0; text-align:left;">Max 5MB, JPG/PNG/WebP.</p>
                     @error('photo')<div class="error">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="actions">
-                    <button class="btn btn-primary" type="submit">Gratis aanmelden</button>
-                    <a class="btn btn-ghost" href="{{ route('home') }}">Terug naar zoeken</a>
+                    <button class="btn btn-primary" type="submit">Bedrijfsprofiel aanvragen</button>
+                    <a class="btn btn-ghost" href="{{ route('home') }}">Terug naar homepage</a>
                 </div>
             </form>
         </div>
-    </div>
+    </section>
 </div>
 </body>
 </html>

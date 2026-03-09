@@ -14,11 +14,13 @@ class SportSeeder extends Seeder
     {
         $sports = [
             ['name' => 'Fitness', 'slug' => 'fitness'],
+            ['name' => 'Personal trainer', 'slug' => 'personal-trainer'],
             ['name' => 'Yoga', 'slug' => 'yoga'],
             ['name' => 'Boksen', 'slug' => 'boksen'],
             ['name' => 'CrossFit', 'slug' => 'crossfit'],
             ['name' => 'Tennis', 'slug' => 'tennis'],
             ['name' => 'Squash', 'slug' => 'squash'],
+            ['name' => 'Padel', 'slug' => 'padel'],
         ];
 
         foreach ($sports as $sport) {

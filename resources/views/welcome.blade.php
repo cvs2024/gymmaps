@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Gymmaps') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
     <style>
         :root {
             --bg: #f4f8fc;
@@ -142,6 +144,7 @@
     </style>
 </head>
 <body>
+@include('partials.site-header')
     <header class="hero">
         <h1>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt</h1>
     </header>

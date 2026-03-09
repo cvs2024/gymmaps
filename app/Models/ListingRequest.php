@@ -18,5 +18,6 @@ class ListingRequest extends Model
         'sports_overview',
         'message',
         'photo_path',
+        'logo_url',
     ];
 }

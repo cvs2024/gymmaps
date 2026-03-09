@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $location->name }} - Gymmap.nl</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
     <style>
         body { margin:0; font-family:"Segoe UI",Roboto,sans-serif; background:#f4f8fc; color:#0e2235; }
         .container { max-width: 980px; margin: 0 auto; padding: 24px 16px 40px; }
@@ -23,6 +25,7 @@
     </style>
 </head>
 <body>
+@include('partials.site-header')
 <div class="container">
     <article class="card hero">
         <img class="photo" src="{{ $photoUrl }}" alt="Foto van {{ $location->name }}">

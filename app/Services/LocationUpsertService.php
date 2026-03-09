@@ -22,6 +22,7 @@ class LocationUpsertService
             'website' => $data['website'] ?? null,
             'phone' => $data['phone'] ?? null,
             'photo_url' => $data['photo_url'] ?? null,
+            'logo_url' => $data['logo_url'] ?? null,
             'source' => $data['source'] ?? null,
             'external_id' => $data['external_id'] ?? null,
             'last_seen_at' => now(),

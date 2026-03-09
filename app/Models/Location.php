@@ -17,6 +17,7 @@ class Location extends Model
         'website',
         'phone',
         'photo_url',
+        'logo_url',
         'source',
         'external_id',
         'imported_at',

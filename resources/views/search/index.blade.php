@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gymmap.nl - Sportlocaties in Nederland</title>
+    <meta name="description" content="GymMaps.nl helpt je snel sportscholen, personal trainers en sportlocaties in Nederland te vinden op kaart, inclusief adres, afstand en sportfilter.">
+    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 
@@ -13,8 +16,8 @@
             --card: #ffffff;
             --text: #0b1f33;
             --muted: #586779;
-            --accent: #0f8a5f;
-            --accent-dark: #0a6a48;
+            --accent: #95c11f;
+            --accent-dark: #7ea61a;
             --border: #d5e0ea;
         }
 
@@ -22,8 +25,12 @@
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
-            background: radial-gradient(circle at top right, #dceefe, var(--bg));
+            background:
+                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
+                radial-gradient(920px 500px at 92% 4%, rgba(149, 193, 31, 0.20), transparent 58%),
+                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #edf8ef 100%);
             color: var(--text);
+            min-height: 100vh;
         }
 
         .site-nav {
@@ -33,12 +40,12 @@
         }
 
         .site-nav-inner {
-            max-width: 1050px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 12px 16px;
+            padding: 12px 20px;
             display: grid;
             grid-template-columns: auto 1fr auto;
-            gap: 20px;
+            gap: 14px;
             align-items: center;
         }
 
@@ -46,61 +53,51 @@
             display: inline-flex;
             align-items: center;
             text-decoration: none;
+            width: 210px;
+            height: 64px;
+            overflow: hidden;
+            margin-left: -8px;
         }
 
         .nav-logo img {
-            height: 42px;
-            width: auto;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: left center;
             display: block;
         }
 
         .nav-menu {
             display: flex;
             justify-content: flex-end;
-            gap: 22px;
+            gap: 10px;
+            flex-wrap: wrap;
             font-family: "Poppins", "Segoe UI", sans-serif;
-            font-weight: 300;
-            font-size: 15px;
+            font-weight: 500;
+            font-size: 14px;
         }
 
         .nav-menu a {
-            color: #21415e;
+            color: #fff;
             text-decoration: none;
+            border-radius: 10px;
+            padding: 9px 13px;
+            background: var(--accent);
+            border: 1px solid var(--accent);
+            line-height: 1;
         }
 
         .nav-menu a:hover {
-            color: #0f8a5f;
-        }
-
-        .nav-auth {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            border-radius: 10px;
-            padding: 9px 14px;
-            font-weight: 600;
-            text-decoration: none;
-            border: 1px solid #c7d6e5;
-        }
-
-        .nav-btn-signup {
-            background: #0f8a5f;
-            border-color: #0f8a5f;
-            color: #fff;
-        }
-
-        .nav-btn-login {
-            background: #fff;
-            color: #21415e;
+            background: var(--accent-dark);
+            border-color: var(--accent-dark);
         }
 
         .hero {
             width: 100%;
             min-height: 400px;
-            background: linear-gradient(135deg, #113a5c, #176089);
+            background:
+                linear-gradient(120deg, rgba(10, 46, 84, 0.72), rgba(20, 95, 148, 0.52), rgba(149, 193, 31, 0.35)),
+                url("{{ asset('hero/hero-stock.jpg') }}") 50% 28%/cover no-repeat;
             color: #fff;
             padding: 24px 16px;
             display: flex;
@@ -110,6 +107,7 @@
 
         .hero-inner {
             width: min(1050px, 100%);
+            text-shadow: 0 2px 14px rgba(8, 28, 48, 0.42);
         }
 
         .container {
@@ -140,7 +138,8 @@
 
         .btn-primary { background: var(--accent); color: #fff; }
         .btn-primary:hover { background: var(--accent-dark); }
-        .btn-light { background: #fff; color: #0d3655; }
+        .btn-light { background: var(--accent); color: #fff; }
+        .btn-light:hover { background: var(--accent-dark); }
 
         .card {
             background: var(--card);
@@ -150,33 +149,102 @@
             margin-bottom: 14px;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
+        .row {
+            display: flex;
             gap: 10px;
+            align-items: stretch;
+            width: 100%;
         }
 
-        input[type="text"], select {
+        .field-search { flex: 2 1 0; min-width: 0; position: relative; }
+        .field-radius { flex: 1 1 0; min-width: 0; }
+        .field-options { flex: 1 1 0; min-width: 0; position: relative; }
+
+        .field-label {
+            display: block;
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], select, .multi-trigger {
             width: 100%;
-            padding: 10px;
+            height: 44px;
             border: 1px solid var(--border);
             border-radius: 10px;
-            margin-top: 6px;
+            padding: 10px 12px;
+            font: inherit;
+            background: #fff;
+            color: var(--text);
         }
 
-        .sports {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+        .multi-trigger {
+            text-align: left;
+            cursor: pointer;
         }
 
-        .pill {
+        .multi-menu {
+            position: absolute;
+            z-index: 20;
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px);
+            background: #fff;
             border: 1px solid var(--border);
-            border-radius: 99px;
-            padding: 7px 11px;
-            background: #f9fbfd;
-            font-size: 0.9rem;
+            border-radius: 10px;
+            padding: 8px;
+            display: none;
+            max-height: 230px;
+            overflow: auto;
+            box-shadow: 0 12px 20px rgba(10, 31, 50, 0.12);
+        }
+
+        .multi-menu.open { display: block; }
+
+        .suggestions {
+            position: absolute;
+            z-index: 30;
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px);
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 12px 20px rgba(10, 31, 50, 0.12);
+            overflow: hidden;
+            display: none;
+        }
+
+        .suggestions.open { display: block; }
+
+        .suggestion-item {
+            width: 100%;
+            border: 0;
+            background: #fff;
+            text-align: left;
+            padding: 10px 12px;
+            font: inherit;
+            color: var(--text);
+            cursor: pointer;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .suggestion-item:last-child { border-bottom: 0; }
+        .suggestion-item:hover, .suggestion-item.active { background: #f3f8fd; }
+
+        .opt {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 4px;
+            font-size: 0.95rem;
+        }
+
+        .actions {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
         }
 
         .list {
@@ -193,6 +261,27 @@
             width: 100%;
             min-height: 420px;
             border-radius: 14px;
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 12px 12px;
+            border-top: 1px solid #dce7f2;
+            background: #f7fbff;
+        }
+
+        .map-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            border: 1px solid #d2e2ee;
+            background: #fff;
+            padding: 4px 10px;
+            font-size: 0.84rem;
+            color: #244a68;
         }
 
         .location-name {
@@ -238,6 +327,12 @@
             background: #edf2f7;
         }
 
+        .location-photo.logo {
+            object-fit: contain;
+            padding: 10px;
+            background: #fff;
+        }
+
         .flash {
             margin-bottom: 10px;
             background: #e8f7f0;
@@ -245,6 +340,32 @@
             padding: 12px;
             border-radius: 10px;
             border: 1px solid #bce8d4;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .stat-item {
+            border: 1px solid #cfe0ee;
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #f7fbff;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin: 0 0 4px;
+        }
+
+        .stat-value {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #103455;
         }
 
         .pager {
@@ -276,11 +397,13 @@
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
-            .nav-menu, .nav-auth {
+            .nav-menu {
                 justify-content: flex-start;
                 flex-wrap: wrap;
             }
-            .grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr; }
+            .row { flex-direction: column; }
+            .field-search, .field-radius, .field-options { flex: 1 1 auto; }
             h1 { font-size: 1.6rem; }
             .location-card { grid-template-columns: 1fr; }
         }
@@ -290,18 +413,17 @@
 <nav class="site-nav">
     <div class="site-nav-inner">
         <a class="nav-logo" href="{{ route('home') }}">
-            <img src="{{ asset('logo') }}" alt="Gymmap logo">
+            <img src="{{ asset('logo/gymmaps-logo.png') }}" alt="Gymmap logo">
         </a>
 
         <div class="nav-menu">
-            <a href="{{ route('home') }}">Home</a>
-            <a href="{{ route('gymbuddy.index') }}">Gymbuddy</a>
-            <a href="{{ route('listing-requests.create') }}">Locatie aanmelden</a>
-        </div>
-
-        <div class="nav-auth">
-            <a class="nav-btn nav-btn-signup" href="{{ route('listing-requests.create') }}">Aanmelden</a>
-            <a class="nav-btn nav-btn-login" href="{{ url('/login') }}">Inloggen</a>
+            <a href="{{ route('listing-requests.create') }}">Sportschool vermelden?</a>
+            <a href="{{ route('gymbuddy.index') }}">Gymbuddy gezocht</a>
+            <a href="{{ route('pages.personal-trainer') }}">Personal trainer</a>
+            <a href="{{ route('pages.blog') }}">Blog</a>
+            <a href="{{ route('pages.faq') }}">FAQ</a>
+            <a href="{{ route('pages.contact') }}">Contact</a>
+            <a href="{{ route('login') }}">Inloggen</a>
         </div>
     </div>
 </nav>
@@ -309,11 +431,7 @@
 <section class="hero">
     <div class="hero-inner">
         <h1>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</h1>
-        <p>Voer je adres, postcode of plaats in en klik op de zoekknop.</p>
-        <div class="toolbar">
-            <a class="btn btn-light" href="{{ route('listing-requests.create') }}">Locatie aanmelden (gratis)</a>
-            <a class="btn btn-light" href="{{ route('gymbuddy.index') }}">Gymbuddy zoeken</a>
-        </div>
+        <p>GymMaps.nl is een overzicht van sportscholen, personal trainers en sportlocaties in Nederland, met kaart, filters en afstandszoeking.</p>
     </div>
 </section>
 
@@ -325,42 +443,75 @@
 
     <section class="card">
         <form method="GET" action="{{ route('home') }}">
-            <div class="grid">
-                <label>
-                    Zoek op adres, postcode of plaats
-                    <input type="text" name="q" value="{{ $query }}" placeholder="Bijv. Utrecht of 3511 NS">
-                </label>
-                <label>
-                    Radius
-                    <select name="radius">
+            <div class="row">
+                <div class="field-search">
+                    <label class="field-label" for="q">Zoek op locatie / adres / postcode</label>
+                    <input id="q" type="text" name="q" value="{{ $query }}" placeholder="Bijv. Utrecht, 3511 NS of Oudegracht 100">
+                    <div class="suggestions" id="searchSuggestions"></div>
+                </div>
+
+                <div class="field-radius">
+                    <label class="field-label" for="radius">Radius</label>
+                    <select id="radius" name="radius">
                         <option value="5" @selected($radius === 5)>5 km</option>
                         <option value="10" @selected($radius === 10)>10 km</option>
                         <option value="20" @selected($radius === 20)>20 km</option>
                         <option value="50" @selected($radius === 50)>50 km</option>
                         <option value="250" @selected($radius === 250)>50+ km</option>
                     </select>
-                </label>
+                </div>
+
+                <div class="field-options" id="sportsFilter">
+                    <label class="field-label">Sport opties (multi-select)</label>
+                    <button type="button" class="multi-trigger" id="multiTrigger">Kies sporten</button>
+                    <div class="multi-menu" id="multiMenu">
+                        @foreach($sports as $sport)
+                            <label class="opt">
+                                <input type="checkbox" name="sports[]" value="{{ $sport->id }}" @checked($selectedSports->contains($sport->id))>
+                                {{ $sport->name }}
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
-            <div class="sports">
-                @foreach($sports as $sport)
-                    <label class="pill">
-                        <input type="checkbox" name="sports[]" value="{{ $sport->id }}" @checked($selectedSports->contains($sport->id))>
-                        {{ $sport->name }}
-                    </label>
-                @endforeach
-            </div>
-
-            <div style="margin-top: 12px;">
+            <div class="actions">
                 <button class="btn btn-primary" type="submit">Vind locaties</button>
             </div>
         </form>
     </section>
 
     <section class="list">
+        @if($isUsingFallbackSource)
+            <article class="card">
+                <p class="location-name">KVK-locaties nog niet beschikbaar</p>
+                <p class="muted">Er zijn nog geen KVK sportscholen met coördinaten geïmporteerd. Tijdelijk tonen we alle beschikbare locaties met coördinaten.</p>
+            </article>
+        @endif
+
+        <article class="card">
+            <div class="stats">
+                <div class="stat-item">
+                    <p class="stat-label">Getoonde KVK-sportscholen</p>
+                    <p class="stat-value">{{ number_format($results->count(), 0, ',', '.') }}</p>
+                </div>
+                <div class="stat-item">
+                    <p class="stat-label">Totaal KVK met coördinaten</p>
+                    <p class="stat-value">{{ number_format($totalKvkLocations, 0, ',', '.') }}</p>
+                </div>
+            </div>
+        </article>
+
         <article class="card map-wrap">
             @if($googleMapsKey !== '')
                 <div id="results-map"></div>
+                <div class="map-legend">
+                    <span class="map-legend-item">🏋️ Fitness / krachttraining</span>
+                    <span class="map-legend-item">🥊 Boksschool</span>
+                    <span class="map-legend-item">🧘 Yogastudio</span>
+                    <span class="map-legend-item">🏋️‍♂️ CrossFit</span>
+                    <span class="map-legend-item">📍 Overig</span>
+                </div>
             @else
                 <div style="padding: 16px;">
                     <p class="location-name">Kaart nog niet actief</p>
@@ -369,7 +520,7 @@
             @endif
         </article>
 
-        @if($query !== '' && !$center)
+        @if($query !== '' && !$center && $results->isEmpty())
             <article class="card">
                 <p class="location-name">Geen middelpunt gevonden voor "{{ $query }}"</p>
                 <p class="muted">Tip: probeer een plaatsnaam of postcode die al bekend is in de database.</p>
@@ -389,59 +540,217 @@
             </article>
         @endif
 
-        @if($center)
-            @foreach(($paginatedResults?->items() ?? []) as $location)
-                <article class="card">
-                    <div class="location-card">
-                        <img
-                            class="location-photo"
-                            src="{{ $location->display_photo_url }}"
-                            alt="Foto van {{ $location->name }}"
-                        >
-                        <div>
-                            <p class="location-name">{{ $location->name }}</p>
-                            <p class="muted">{{ $location->address }}, {{ $location->postcode }} {{ $location->city }}</p>
+        @foreach(($paginatedResults?->items() ?? []) as $location)
+            <article class="card">
+                <div class="location-card">
+                    <img
+                        class="location-photo {{ $location->display_logo_url ? 'logo' : '' }}"
+                        src="{{ $location->display_logo_url ?: $location->display_photo_url }}"
+                        alt="Foto van {{ $location->name }}"
+                        @if($location->display_logo_url)
+                            data-fallback="{{ $location->display_photo_url }}"
+                            onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.classList.remove('logo');this.removeAttribute('data-fallback');this.onerror=null;}"
+                        @endif
+                    >
+                    <div>
+                        <p class="location-name">{{ $location->name }}</p>
+                        <p class="muted">{{ $location->address }}, {{ $location->postcode }} {{ $location->city }}</p>
+                        @if($location->distance_km !== null)
                             <p class="muted">Afstand: {{ number_format($location->distance_km, 1, ',', '.') }} km</p>
-                            <div class="tags">
-                                @foreach($location->sports as $sport)
-                                    <span class="tag">{{ $sport->name }}</span>
-                                @endforeach
-                            </div>
-                            @if($location->phone)
-                                <p class="muted">
-                                    {{ $location->phone }}
-                                </p>
-                            @endif
-                            <p style="margin-top: 10px;">
-                                <a class="btn btn-primary" href="{{ route('locations.show', $location) }}">Bekijk sportschool</a>
-                            </p>
+                        @endif
+                        <div class="tags">
+                            @foreach($location->sports as $sport)
+                                <span class="tag">{{ $sport->name }}</span>
+                            @endforeach
                         </div>
-                    </div>
-                </article>
-            @endforeach
-
-            @if($paginatedResults && $paginatedResults->lastPage() > 1)
-                <article class="card">
-                    <div class="pager">
-                        @if($paginatedResults->onFirstPage())
-                            <span class="disabled">Vorige</span>
-                        @else
-                            <a href="{{ $paginatedResults->previousPageUrl() }}">Vorige</a>
+                        @if($location->phone)
+                            <p class="muted">
+                                {{ $location->phone }}
+                            </p>
                         @endif
-
-                        <span>Pagina {{ $paginatedResults->currentPage() }} / {{ $paginatedResults->lastPage() }}</span>
-
-                        @if($paginatedResults->hasMorePages())
-                            <a href="{{ $paginatedResults->nextPageUrl() }}">Volgende</a>
-                        @else
-                            <span class="disabled">Volgende</span>
-                        @endif
+                        <p style="margin-top: 10px;">
+                            <a class="btn btn-primary" href="{{ route('locations.show', $location) }}">Bekijk sportschool</a>
+                        </p>
                     </div>
-                </article>
-            @endif
+                </div>
+            </article>
+        @endforeach
+
+        @if($paginatedResults && $paginatedResults->lastPage() > 1)
+            <article class="card">
+                <div class="pager">
+                    @if($paginatedResults->onFirstPage())
+                        <span class="disabled">Vorige</span>
+                    @else
+                        <a href="{{ $paginatedResults->previousPageUrl() }}">Vorige</a>
+                    @endif
+
+                    <span>Pagina {{ $paginatedResults->currentPage() }} / {{ $paginatedResults->lastPage() }}</span>
+
+                    @if($paginatedResults->hasMorePages())
+                        <a href="{{ $paginatedResults->nextPageUrl() }}">Volgende</a>
+                    @else
+                        <span class="disabled">Volgende</span>
+                    @endif
+                </div>
+            </article>
+        @endif
+
+        @if(($paginatedResults?->count() ?? 0) === 0)
+            <article class="card">
+                <p class="location-name">Nog geen resultaten zichtbaar</p>
+                <p class="muted">Controleer de filters en radius, of importeer KVK-data opnieuw zodat kaart en overzicht gevuld worden.</p>
+            </article>
         @endif
     </section>
 </div>
+<script>
+    const filterTrigger = document.getElementById('multiTrigger');
+    const filterMenu = document.getElementById('multiMenu');
+    const filterContainer = document.getElementById('sportsFilter');
+    const queryInput = document.getElementById('q');
+    const suggestionBox = document.getElementById('searchSuggestions');
+    const suggestionEndpoint = @json(route('home.suggestions'));
+
+    if (filterTrigger && filterMenu && filterContainer) {
+        const filterChecks = Array.from(filterMenu.querySelectorAll('input[type="checkbox"]'));
+
+        const updateFilterLabel = () => {
+            const selected = filterChecks
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => checkbox.parentElement.textContent.trim());
+            filterTrigger.textContent = selected.length ? selected.join(', ') : 'Kies sporten';
+        };
+
+        filterTrigger.addEventListener('click', () => {
+            filterMenu.classList.toggle('open');
+        });
+
+        filterChecks.forEach((checkbox) => checkbox.addEventListener('change', updateFilterLabel));
+
+        document.addEventListener('click', (event) => {
+            if (!filterContainer.contains(event.target)) {
+                filterMenu.classList.remove('open');
+            }
+        });
+
+        updateFilterLabel();
+    }
+
+    if (queryInput && suggestionBox) {
+        let debounceTimer = null;
+        let abortController = null;
+        let currentItems = [];
+        let activeIndex = -1;
+
+        const closeSuggestions = () => {
+            suggestionBox.classList.remove('open');
+            suggestionBox.innerHTML = '';
+            currentItems = [];
+            activeIndex = -1;
+        };
+
+        const setInputValue = (value) => {
+            queryInput.value = value;
+            closeSuggestions();
+        };
+
+        const updateActive = () => {
+            const buttons = Array.from(suggestionBox.querySelectorAll('.suggestion-item'));
+            buttons.forEach((button, index) => {
+                button.classList.toggle('active', index === activeIndex);
+            });
+        };
+
+        const renderSuggestions = (items) => {
+            currentItems = items;
+            activeIndex = -1;
+            if (!items.length) {
+                closeSuggestions();
+                return;
+            }
+
+            suggestionBox.innerHTML = items
+                .map((item) => `<button type="button" class="suggestion-item" data-value="${item.value.replace(/"/g, '&quot;')}">${item.label}</button>`)
+                .join('');
+            suggestionBox.classList.add('open');
+        };
+
+        queryInput.addEventListener('input', () => {
+            const value = queryInput.value.trim();
+            if (value.length < 1) {
+                closeSuggestions();
+                return;
+            }
+
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+            }
+
+            debounceTimer = setTimeout(async () => {
+                if (abortController) {
+                    abortController.abort();
+                }
+
+                abortController = new AbortController();
+
+                try {
+                    const response = await fetch(`${suggestionEndpoint}?q=${encodeURIComponent(value)}&limit=8`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' },
+                        signal: abortController.signal,
+                    });
+
+                    if (!response.ok) {
+                        closeSuggestions();
+                        return;
+                    }
+
+                    const payload = await response.json();
+                    renderSuggestions(Array.isArray(payload.items) ? payload.items : []);
+                } catch (error) {
+                    closeSuggestions();
+                }
+            }, 180);
+        });
+
+        queryInput.addEventListener('keydown', (event) => {
+            if (!currentItems.length) {
+                return;
+            }
+
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                activeIndex = Math.min(activeIndex + 1, currentItems.length - 1);
+                updateActive();
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                activeIndex = Math.max(activeIndex - 1, 0);
+                updateActive();
+            } else if (event.key === 'Enter' && activeIndex >= 0) {
+                event.preventDefault();
+                setInputValue(currentItems[activeIndex].value);
+            } else if (event.key === 'Escape') {
+                closeSuggestions();
+            }
+        });
+
+        suggestionBox.addEventListener('click', (event) => {
+            const button = event.target.closest('.suggestion-item');
+            if (!button) {
+                return;
+            }
+
+            setInputValue(button.dataset.value || '');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!suggestionBox.contains(event.target) && event.target !== queryInput) {
+                closeSuggestions();
+            }
+        });
+    }
+</script>
 @if($googleMapsKey !== '')
     <script>
         function initGymmapResultsMap() {
@@ -467,14 +776,71 @@
                 mapTypeControl: false,
                 streetViewControl: false,
                 fullscreenControl: true,
+                styles: [
+                    { elementType: "geometry", stylers: [{ color: "#e8f1f7" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#2a4866" }] },
+                    { elementType: "labels.text.stroke", stylers: [{ color: "#ffffff" }] },
+                    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#a8c0d6" }] },
+                    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#d8e9d8" }] },
+                    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#cce4cf" }] },
+                    { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+                    { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#f2f7fb" }] },
+                    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#d5e4f4" }] },
+                    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#dce8f3" }] },
+                    { featureType: "water", elementType: "geometry", stylers: [{ color: "#9ed1ee" }] },
+                    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#21506f" }] },
+                ],
             });
+
+            const getCategory = (sports) => {
+                const joined = Array.isArray(sports)
+                    ? sports.join(" ").toLowerCase()
+                    : "";
+                if (joined.includes("crossfit")) return "crossfit";
+                if (joined.includes("bok")) return "boxing";
+                if (joined.includes("yoga")) return "yoga";
+                if (joined.includes("fitness") || joined.includes("kracht")) return "fitness";
+                return "other";
+            };
+
+            const categoryMeta = {
+                fitness: { emoji: "🏋️", color: "#0d8f6f" },
+                boxing: { emoji: "🥊", color: "#2f76d0" },
+                yoga: { emoji: "🧘", color: "#4d9860" },
+                crossfit: { emoji: "🏋️‍♂️", color: "#195f9b" },
+                other: { emoji: "📍", color: "#4f6b85" },
+            };
+
+            const markerIcon = (category) => {
+                const config = categoryMeta[category] ?? categoryMeta.other;
+                const svg = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" viewBox="0 0 46 46">
+                        <circle cx="23" cy="23" r="20" fill="${config.color}" opacity="0.94" />
+                        <circle cx="23" cy="23" r="20" fill="none" stroke="#ffffff" stroke-width="2.8" />
+                    </svg>
+                `.trim();
+
+                return {
+                    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+                    scaledSize: new google.maps.Size(46, 46),
+                    anchor: new google.maps.Point(23, 23),
+                    labelOrigin: new google.maps.Point(23, 24),
+                };
+            };
 
             if (hasSearchCenter) {
                 new google.maps.Marker({
                     position: center,
                     map,
                     title: "Zoekcentrum",
-                    icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: "#174f86",
+                        fillOpacity: 1,
+                        strokeColor: "#ffffff",
+                        strokeWeight: 2,
+                        scale: 8,
+                    },
                 });
             }
 
@@ -485,11 +851,20 @@
             const markers = [];
 
             locations.forEach((location) => {
+                const category = getCategory(location.sports);
                 const marker = new google.maps.Marker({
                     position: { lat: location.lat, lng: location.lng },
                     map,
                     title: location.name,
+                    icon: markerIcon(category),
+                    label: {
+                        text: (categoryMeta[category] ?? categoryMeta.other).emoji,
+                        color: "#ffffff",
+                        fontSize: "16px",
+                        fontWeight: "700",
+                    },
                 });
+                marker.gymmapsCategory = category;
                 markers.push(marker);
 
                 bounds.extend(marker.getPosition());
@@ -498,8 +873,8 @@
                     const distanceLine = location.distance !== null
                         ? `<br>Afstand: ${escapeHtml(location.distance.toFixed(1))} km`
                         : "";
-                    const photoLine = location.photo_url
-                        ? `<br><img src="${escapeHtml(location.photo_url)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:cover;border-radius:6px;margin-top:6px;">`
+                    const photoLine = (location.logo_url || location.photo_url)
+                        ? `<br><img src="${escapeHtml(location.logo_url || location.photo_url)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:${location.logo_url ? 'contain' : 'cover'};padding:${location.logo_url ? '8px' : '0'};background:#fff;border-radius:6px;margin-top:6px;" ${location.logo_url ? `data-fallback="${escapeHtml(location.photo_url || '')}"` : ''} onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.style.objectFit='cover';this.style.padding='0';delete this.dataset.fallback;}">`
                         : "";
                     const detailLink = location.detail_url
                         ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
@@ -511,12 +886,46 @@
                 });
             });
 
-            if (locations.length > 0 && hasSearchCenter) {
+            if (locations.length > 0) {
                 map.fitBounds(bounds);
             }
 
             if (window.markerClusterer && markers.length > 1) {
-                new markerClusterer.MarkerClusterer({ map, markers });
+                const clusterRenderer = {
+                    render({ count, position, markers: clusterMarkers }) {
+                        const counts = clusterMarkers.reduce((acc, marker) => {
+                            const key = marker.gymmapsCategory || "other";
+                            acc[key] = (acc[key] ?? 0) + 1;
+                            return acc;
+                        }, {});
+                        const dominantCategory = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0] || "other";
+                        const meta = categoryMeta[dominantCategory] ?? categoryMeta.other;
+                        const svg = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+                                <circle cx="32" cy="32" r="29" fill="${meta.color}" fill-opacity="0.88" />
+                                <circle cx="32" cy="32" r="29" fill="none" stroke="#ffffff" stroke-width="3" />
+                            </svg>
+                        `.trim();
+
+                        return new google.maps.Marker({
+                            position,
+                            icon: {
+                                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+                                scaledSize: new google.maps.Size(64, 64),
+                                anchor: new google.maps.Point(32, 32),
+                            },
+                            label: {
+                                text: `${meta.emoji} ${count}`,
+                                color: "#ffffff",
+                                fontSize: "15px",
+                                fontWeight: "700",
+                            },
+                            zIndex: Number(google.maps.Marker.MAX_ZINDEX) + count,
+                        });
+                    },
+                };
+
+                new markerClusterer.MarkerClusterer({ map, markers, renderer: clusterRenderer });
             }
         }
     </script>
