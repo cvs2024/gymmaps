@@ -503,21 +503,14 @@
         </article>
 
         <article class="card map-wrap">
-            @if($googleMapsKey !== '')
-                <div id="results-map"></div>
-                <div class="map-legend">
-                    <span class="map-legend-item">🏋️ Fitness / krachttraining</span>
-                    <span class="map-legend-item">🥊 Boksschool</span>
-                    <span class="map-legend-item">🧘 Yogastudio</span>
-                    <span class="map-legend-item">🏋️‍♂️ CrossFit</span>
-                    <span class="map-legend-item">📍 Overig</span>
-                </div>
-            @else
-                <div style="padding: 16px;">
-                    <p class="location-name">Kaart nog niet actief</p>
-                    <p class="muted">Voeg een geldige Google Maps API-key toe in <code>GOOGLE_MAPS_API_KEY</code> om de kaart en stipjes te tonen.</p>
-                </div>
-            @endif
+            <div id="results-map"></div>
+            <div class="map-legend">
+                <span class="map-legend-item">🏋️ Fitness / krachttraining</span>
+                <span class="map-legend-item">🥊 Boksschool</span>
+                <span class="map-legend-item">🧘 Yogastudio</span>
+                <span class="map-legend-item">🏋️‍♂️ CrossFit</span>
+                <span class="map-legend-item">📍 Overig</span>
+            </div>
         </article>
 
         @if($query !== '' && !$center && $results->isEmpty())
@@ -549,7 +542,10 @@
                         alt="Foto van {{ $location->name }}"
                         @if($location->display_logo_url)
                             data-fallback="{{ $location->display_photo_url }}"
-                            onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.classList.remove('logo');this.removeAttribute('data-fallback');this.onerror=null;}"
+                            data-final-fallback="{{ $location->fallback_photo_url }}"
+                            onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.classList.remove('logo');this.dataset.fallback='';return;}if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';return;}this.onerror=null;"
+                        @else
+                            onerror="this.onerror=null;this.src='{{ $location->fallback_photo_url }}';this.classList.remove('logo');"
                         @endif
                     >
                     <div>
@@ -874,7 +870,7 @@
                         ? `<br>Afstand: ${escapeHtml(location.distance.toFixed(1))} km`
                         : "";
                     const photoLine = (location.logo_url || location.photo_url)
-                        ? `<br><img src="${escapeHtml(location.logo_url || location.photo_url)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:${location.logo_url ? 'contain' : 'cover'};padding:${location.logo_url ? '8px' : '0'};background:#fff;border-radius:6px;margin-top:6px;" ${location.logo_url ? `data-fallback="${escapeHtml(location.photo_url || '')}"` : ''} onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.style.objectFit='cover';this.style.padding='0';delete this.dataset.fallback;}">`
+                        ? `<br><img src="${escapeHtml(location.logo_url || location.photo_url)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:${location.logo_url ? 'contain' : 'cover'};padding:${location.logo_url ? '8px' : '0'};background:#fff;border-radius:6px;margin-top:6px;" ${location.logo_url ? `data-fallback="${escapeHtml(location.photo_url || '')}"` : ''} data-final-fallback="${escapeHtml(location.fallback_photo_url || '')}" onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.style.objectFit='cover';this.style.padding='0';this.dataset.fallback='';return;}if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';return;}this.onerror=null;">`
                         : "";
                     const detailLink = location.detail_url
                         ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
@@ -931,6 +927,77 @@
     </script>
     <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsKey }}&callback=initGymmapResultsMap"></script>
+@else
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        (function initGymmapLeafletFallback() {
+            const hasSearchCenter = {{ $hasSearchCenter ? 'true' : 'false' }};
+            const center = [{{ $mapCenterLat }}, {{ $mapCenterLng }}];
+            const locations = @json($mapLocations);
+            const escapeHtml = (value) =>
+                String(value ?? '')
+                    .replaceAll('&', '&amp;')
+                    .replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('"', '&quot;')
+                    .replaceAll("'", '&#039;');
+            const map = L.map('results-map', { zoomControl: true }).setView(center, {{ $mapZoom }});
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap-bijdragers',
+            }).addTo(map);
+
+            if (hasSearchCenter) {
+                L.circleMarker(center, {
+                    radius: 8,
+                    color: '#ffffff',
+                    weight: 2,
+                    fillColor: '#174f86',
+                    fillOpacity: 1,
+                }).addTo(map).bindPopup('Zoekcentrum');
+            }
+
+            const bounds = [];
+            bounds.push(center);
+
+            const getCategory = (sports) => {
+                const joined = Array.isArray(sports) ? sports.join(' ').toLowerCase() : '';
+                if (joined.includes('crossfit')) return { emoji: '🏋️‍♂️' };
+                if (joined.includes('bok')) return { emoji: '🥊' };
+                if (joined.includes('yoga')) return { emoji: '🧘' };
+                if (joined.includes('fitness') || joined.includes('kracht')) return { emoji: '🏋️' };
+                return { emoji: '📍' };
+            };
+
+            locations.forEach((location) => {
+                const category = getCategory(location.sports);
+                const icon = L.divIcon({
+                    html: `<div style="width:34px;height:34px;border-radius:50%;background:#0f5f8b;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.3);">${category.emoji}</div>`,
+                    className: '',
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17],
+                });
+
+                const marker = L.marker([location.lat, location.lng], { icon }).addTo(map);
+                const distanceLine = location.distance !== null ? `<br>Afstand: ${location.distance.toFixed(1)} km` : '';
+                const photoCandidate = location.logo_url || location.photo_url || location.fallback_photo_url;
+                const photoLine = photoCandidate
+                    ? `<br><img src="${escapeHtml(photoCandidate)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:cover;border-radius:6px;margin-top:6px;" onerror="this.onerror=null;this.src='${escapeHtml(location.fallback_photo_url || '')}'">`
+                    : '';
+                const detailLink = location.detail_url
+                    ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
+                    : '';
+                marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${escapeHtml(location.address)}${distanceLine}${photoLine}${detailLink}`);
+                bounds.push([location.lat, location.lng]);
+            });
+
+            if (bounds.length > 1) {
+                map.fitBounds(bounds, { padding: [28, 28] });
+            }
+        })();
+    </script>
 @endif
 </body>
 </html>

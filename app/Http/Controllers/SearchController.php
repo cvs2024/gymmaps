@@ -137,6 +137,7 @@ class SearchController extends Controller
                 ->map(function (Location $location) use ($googleMapsKey) {
                     $location->display_photo_url = $this->resolvePhotoUrl($location, $googleMapsKey);
                     $location->display_logo_url = $this->resolveLogoUrl($location);
+                    $location->fallback_photo_url = $this->defaultPhotoDataUri($location->name);
 
                     return $location;
                 })
@@ -158,6 +159,7 @@ class SearchController extends Controller
                     $location->distance_km = null;
                     $location->display_photo_url = $this->resolvePhotoUrl($location, $googleMapsKey);
                     $location->display_logo_url = $this->resolveLogoUrl($location);
+                    $location->fallback_photo_url = $this->defaultPhotoDataUri($location->name);
 
                     return $location;
                 })
@@ -188,6 +190,7 @@ class SearchController extends Controller
                 'distance' => $location->distance_km !== null ? (float) $location->distance_km : null,
                 'photo_url' => $location->display_photo_url,
                 'logo_url' => $location->display_logo_url,
+                'fallback_photo_url' => $location->fallback_photo_url,
                 'detail_url' => route('locations.show', $location),
                 'sports' => $location->sports->pluck('name')->values()->all(),
             ];
@@ -226,7 +229,7 @@ class SearchController extends Controller
             return "https://maps.googleapis.com/maps/api/streetview?size=640x360&location={$locationParam}&fov=90&pitch=0&key={$googleMapsKey}";
         }
 
-        return 'https://placehold.co/640x360/eaf1f7/587089?text=Geen+foto';
+        return $this->defaultPhotoDataUri($location->name);
     }
 
     private function resolveLogoUrl(Location $location): ?string
@@ -250,6 +253,30 @@ class SearchController extends Controller
         }
 
         return 'https://www.google.com/s2/favicons?domain='.rawurlencode($host).'&sz=256';
+    }
+
+    private function defaultPhotoDataUri(string $name): string
+    {
+        $safeName = trim($name) !== '' ? trim($name) : 'GymMaps locatie';
+        $safeName = htmlspecialchars($safeName, ENT_QUOTES, 'UTF-8');
+
+        $svg = <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e8f1f8"/>
+      <stop offset="100%" stop-color="#d8e8f3"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#g)"/>
+  <circle cx="120" cy="90" r="56" fill="#95c11f" fill-opacity="0.25"/>
+  <circle cx="545" cy="286" r="72" fill="#0f4f7c" fill-opacity="0.18"/>
+  <text x="320" y="162" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#1a4a70" font-weight="700">Geen foto beschikbaar</text>
+  <text x="320" y="202" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#3f6280">{$safeName}</text>
+</svg>
+SVG;
+
+        return 'data:image/svg+xml;charset=UTF-8,'.rawurlencode($svg);
     }
 
     private function mapZoomForRadius(int $radius): int
