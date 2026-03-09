@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Veelgestelde vragen - GymMaps.nl</title>
+    <title>Veelgestelde vragen</title>
     <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
     <meta name="description" content="Veelgestelde vragen over GymMaps.nl: sportscholen zoeken, gymbuddy, personal trainers en bedrijfsprofielen.">
@@ -150,7 +150,7 @@
 @include('partials.site-header')
 <div class="container">
     <section class="hero">
-        <h1>Veelgestelde vragen - GymMaps.nl</h1>
+        <h1>Veelgestelde vragen</h1>
         <p>Hier vind je antwoorden op de meest gestelde vragen over zoeken, gymbuddy oproepen, personal trainers en bedrijfsprofielen op GymMaps.nl.</p>
     </section>
 

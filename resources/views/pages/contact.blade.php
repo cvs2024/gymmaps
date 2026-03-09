@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
     <meta name="description" content="Neem contact op met GymMaps.nl voor vragen, feedback of het aanmelden van jouw sportlocatie.">
     <style>
+        * { box-sizing: border-box; }
         body { margin:0; font-family:"Segoe UI", Roboto, sans-serif; background:#f4f8fc; color:#0b1f33; }
         .container { max-width:860px; margin:0 auto; padding:28px 16px 40px; }
         .card { background:#fff; border:1px solid #d5e0ea; border-radius:14px; padding:18px; }
@@ -16,12 +17,15 @@
         .flash { margin-bottom:10px; background:#e8f7f0; color:#14563c; padding:12px; border-radius:10px; border:1px solid #bce8d4; }
         .error-box { margin-bottom:10px; background:#fff4f4; color:#8b1f1f; padding:12px; border-radius:10px; border:1px solid #f1c6c6; }
         .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        form { width: 100%; }
         .field { margin-bottom:12px; }
         label { display:block; font-weight:600; margin-bottom:6px; color:#123a5f; }
-        input, textarea { width:100%; border:1px solid #c7d8e8; border-radius:10px; padding:11px; font:inherit; background:#f7fbff; }
+        input, textarea { width:100%; max-width:100%; border:1px solid #c7d8e8; border-radius:10px; padding:11px; font:inherit; background:#f7fbff; }
         .error { color:#9f1d1d; font-size:0.9rem; margin-top:4px; }
-        .btn { display:inline-block; margin-top:12px; background:#95c11f; color:#fff; text-decoration:none; border-radius:10px; padding:10px 14px; font-weight:600; border:0; cursor:pointer; }
+        .btn-row { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn { display:inline-block; background:#95c11f; color:#fff; text-decoration:none; border-radius:10px; padding:10px 14px; font-weight:600; border:0; cursor:pointer; }
         .btn-ghost { background:#e7eff8; color:#163f62; margin-left:8px; }
+        .btn-ghost { margin-left: 0; }
         @media (max-width:760px) { .grid { grid-template-columns:1fr; } }
     </style>
 </head>
@@ -74,8 +78,9 @@
                 @error('message')<div class="error">{{ $message }}</div>@enderror
             </div>
 
-            <button class="btn" type="submit">Verstuur vraag</button>
-            <a class="btn btn-ghost" href="{{ route('listing-requests.create') }}">Locatie aanmelden</a>
+            <div class="btn-row">
+                <button class="btn" type="submit">Verstuur vraag</button>
+            </div>
         </form>
     </div>
 </div>

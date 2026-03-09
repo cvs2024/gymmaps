@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Blogs - GymMaps.nl</title>
+    <title>Blogs</title>
     <meta name="description" content="Lees blogs van GymMaps.nl over sportscholen, gymbuddy's en personal trainers in Nederland.">
     <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
@@ -44,7 +44,7 @@
 @include('partials.site-header')
 <div class="container">
     <section class="hero">
-        <h1>Blogs - GymMaps.nl</h1>
+        <h1>Blogs</h1>
         <p>Klik op een blog om het volledige artikel op een aparte pagina te lezen.</p>
     </section>
 
