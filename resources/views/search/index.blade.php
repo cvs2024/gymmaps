@@ -999,5 +999,6 @@
         })();
     </script>
 @endif
+@include('partials.site-footer')
 </body>
 </html>

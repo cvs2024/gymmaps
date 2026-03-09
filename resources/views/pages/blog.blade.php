@@ -98,5 +98,6 @@
 
     <a class="btn" href="{{ route('home') }}">Terug naar homepage</a>
 </div>
+@include('partials.site-footer')
 </body>
 </html>

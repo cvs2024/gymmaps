@@ -76,5 +76,6 @@
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsKey }}&callback=initLocationMap"></script>
 @endif
+@include('partials.site-footer')
 </body>
 </html>
