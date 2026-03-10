@@ -23,12 +23,12 @@ class ContactController extends Controller
             'message' => ['required', 'string', 'max:3000'],
         ]);
 
-        $toAddress = (string) config('mail.from.address');
+        $toAddress = (string) config('mail.admin.address');
         if ($toAddress === '') {
             return back()
                 ->withInput()
                 ->withErrors([
-                    'mail' => 'Contactformulier kon niet versturen: MAIL_FROM_ADDRESS ontbreekt.',
+                    'mail' => 'Contactformulier kon niet versturen: ADMIN_EMAIL ontbreekt.',
                 ]);
         }
 

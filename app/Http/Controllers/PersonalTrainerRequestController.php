@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminFormSubmissionMail;
 use App\Models\PersonalTrainerRequest;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 
 class PersonalTrainerRequestController extends Controller
@@ -50,9 +53,42 @@ class PersonalTrainerRequestController extends Controller
         ]);
 
         PersonalTrainerRequest::query()->create($validated);
+        $this->notifyAdmin($validated);
 
         return redirect()
             ->route('pages.personal-trainer')
             ->with('status', 'Je oproep voor een personal trainer is geplaatst.');
+    }
+
+    private function notifyAdmin(array $payload): void
+    {
+        $adminAddress = (string) config('mail.admin.address');
+        if ($adminAddress === '') {
+            return;
+        }
+
+        try {
+            Mail::to($adminAddress)->send(new AdminFormSubmissionMail(
+                'Nieuwe personal trainer oproep',
+                [
+                    'Naam' => $payload['name'] ?? null,
+                    'E-mail' => $payload['email'] ?? null,
+                    'Telefoon' => $payload['phone'] ?? null,
+                    'Gewenste locatie' => $payload['training_location'] ?? null,
+                    'Plaats / regio' => $payload['city'] ?? null,
+                    'Dagen per week' => $payload['days_per_week'] ?? null,
+                    'Sport / doel' => $payload['sport_focus'] ?? null,
+                    'Max tarief' => $payload['max_rate'] ?? null,
+                    'Trainingsdoel' => $payload['goal'] ?? null,
+                    'Extra info' => $payload['message'] ?? null,
+                ],
+                $payload['email'] ?? null,
+                $payload['name'] ?? null
+            ));
+        } catch (\Throwable $e) {
+            Log::warning('Kon admin-mail voor personal trainer oproep niet versturen.', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

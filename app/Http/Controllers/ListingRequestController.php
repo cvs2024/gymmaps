@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminFormSubmissionMail;
 use App\Models\ListingRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ListingRequestController extends Controller
 {
@@ -36,9 +39,43 @@ class ListingRequestController extends Controller
         unset($validated['photo']);
 
         ListingRequest::query()->create($validated);
+        $this->notifyAdmin($validated);
 
         return redirect()
             ->route('home')
             ->with('status', 'Bedankt! Je aanmelding is ontvangen en wordt snel gecontroleerd.');
+    }
+
+    private function notifyAdmin(array $payload): void
+    {
+        $adminAddress = (string) config('mail.admin.address');
+        if ($adminAddress === '') {
+            return;
+        }
+
+        try {
+            Mail::to($adminAddress)->send(new AdminFormSubmissionMail(
+                'Nieuwe sportlocatie aanmelding',
+                [
+                    'Contactpersoon' => $payload['contact_name'] ?? null,
+                    'E-mail' => $payload['email'] ?? null,
+                    'Telefoon' => $payload['phone'] ?? null,
+                    'Naam locatie' => $payload['business_name'] ?? null,
+                    'Website' => $payload['website'] ?? null,
+                    'Adres' => $payload['address'] ?? null,
+                    'Postcode' => $payload['postcode'] ?? null,
+                    'Plaats' => $payload['city'] ?? null,
+                    'Sportactiviteiten' => $payload['sports_overview'] ?? null,
+                    'Extra toelichting' => $payload['message'] ?? null,
+                    'Logo URL' => $payload['logo_url'] ?? null,
+                ],
+                $payload['email'] ?? null,
+                $payload['contact_name'] ?? null
+            ));
+        } catch (\Throwable $e) {
+            Log::warning('Kon admin-mail voor listing request niet versturen.', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

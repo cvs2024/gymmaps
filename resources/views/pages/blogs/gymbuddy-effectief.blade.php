@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.google-site-verification')
     <title>Waarom sporten met een gymbuddy zo effectief is - GymMaps.nl</title>
     <meta name="description" content="Waarom trainen met een gymbuddy zorgt voor meer motivatie en betere resultaten.">
     <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">

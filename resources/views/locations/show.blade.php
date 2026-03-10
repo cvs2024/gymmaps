@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.google-site-verification')
     <title>{{ $location->name }} - Gymmap.nl</title>
     <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">

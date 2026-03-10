@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.google-site-verification')
     <title>De beste sportscholen in Nederland - GymMaps.nl</title>
     <meta name="description" content="Hoe vind je de beste sportschool in Nederland of in jouw regio.">
     <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">

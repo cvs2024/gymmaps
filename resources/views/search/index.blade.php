@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.google-site-verification')
     <title>Gymmap.nl - Sportlocaties in Nederland</title>
     <meta name="description" content="GymMaps.nl helpt je snel sportscholen, personal trainers en sportlocaties in Nederland te vinden op kaart, inclusief adres, afstand en sportfilter.">
     <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
@@ -92,28 +93,10 @@
             border-color: var(--accent-dark);
         }
 
-        .hero {
-            width: 100%;
-            min-height: 400px;
-            background:
-                linear-gradient(120deg, rgba(10, 46, 84, 0.72), rgba(20, 95, 148, 0.52), rgba(149, 193, 31, 0.35)),
-                url("{{ asset('hero/hero-stock.jpg') }}") 50% 28%/cover no-repeat;
-            color: #fff;
-            padding: 24px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hero-inner {
-            width: min(1050px, 100%);
-            text-shadow: 0 2px 14px rgba(8, 28, 48, 0.42);
-        }
-
         .container {
-            max-width: 1050px;
+            max-width: 1220px;
             margin: 0 auto;
-            padding: 28px 16px 40px;
+            padding: 14px 16px 40px;
         }
 
         h1 { margin: 0 0 8px; font-size: 2rem; }
@@ -149,11 +132,34 @@
             margin-bottom: 14px;
         }
 
-        .row {
-            display: flex;
+        .top-layout {
+            display: grid;
+            grid-template-columns: minmax(320px, 1fr) minmax(0, 2fr);
+            gap: 14px;
+            align-items: start;
+            margin-bottom: 14px;
+        }
+
+        .mini-hero {
+            background: linear-gradient(135deg, rgba(15, 63, 115, 0.95), rgba(31, 94, 154, 0.9));
+            border: 1px solid #2c6ca4;
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 10px 24px rgba(10, 45, 79, 0.2);
+        }
+
+        .mini-hero p {
+            margin: 0;
+            color: #fff;
+            font-size: 0.97rem;
+            letter-spacing: 0.01em;
+        }
+
+        .filter-panel form {
+            display: grid;
             gap: 10px;
-            align-items: stretch;
-            width: 100%;
         }
 
         .field-search { flex: 2 1 0; min-width: 0; position: relative; }
@@ -245,6 +251,16 @@
             margin-top: 12px;
             display: flex;
             justify-content: flex-end;
+        }
+
+        .filter-panel .actions {
+            justify-content: stretch;
+            margin-top: 4px;
+        }
+
+        .filter-panel .actions .btn {
+            width: 100%;
+            text-align: center;
         }
 
         .list {
@@ -401,8 +417,10 @@
                 justify-content: flex-start;
                 flex-wrap: wrap;
             }
+            .top-layout {
+                grid-template-columns: 1fr;
+            }
             .stats { grid-template-columns: 1fr; }
-            .row { flex-direction: column; }
             .field-search, .field-radius, .field-options { flex: 1 1 auto; }
             h1 { font-size: 1.6rem; }
             .location-card { grid-template-columns: 1fr; }
@@ -428,37 +446,23 @@
     </div>
 </nav>
 
-<section class="hero">
-    <div class="hero-inner">
-        <h1>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</h1>
-        <p>GymMaps.nl is een overzicht van sportscholen, personal trainers en sportlocaties in Nederland, met kaart, filters en afstandszoeking.</p>
-    </div>
-</section>
-
 <div class="container">
 
     @if(session('status'))
         <div class="flash">{{ session('status') }}</div>
     @endif
 
-    <section class="card">
-        <form method="GET" action="{{ route('home') }}">
-            <div class="row">
+    <section class="mini-hero">
+        <p>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</p>
+    </section>
+
+    <section class="top-layout">
+        <aside class="card filter-panel">
+            <form method="GET" action="{{ route('home') }}">
                 <div class="field-search">
                     <label class="field-label" for="q">Zoek op locatie / adres / postcode</label>
                     <input id="q" type="text" name="q" value="{{ $query }}" placeholder="Bijv. Utrecht, 3511 NS of Oudegracht 100">
                     <div class="suggestions" id="searchSuggestions"></div>
-                </div>
-
-                <div class="field-radius">
-                    <label class="field-label" for="radius">Radius</label>
-                    <select id="radius" name="radius">
-                        <option value="5" @selected($radius === 5)>5 km</option>
-                        <option value="10" @selected($radius === 10)>10 km</option>
-                        <option value="20" @selected($radius === 20)>20 km</option>
-                        <option value="50" @selected($radius === 50)>50 km</option>
-                        <option value="250" @selected($radius === 250)>50+ km</option>
-                    </select>
                 </div>
 
                 <div class="field-options" id="sportsFilter">
@@ -473,12 +477,34 @@
                         @endforeach
                     </div>
                 </div>
-            </div>
 
-            <div class="actions">
-                <button class="btn btn-primary" type="submit">Vind locaties</button>
+                <div class="field-radius">
+                    <label class="field-label" for="radius">Radius</label>
+                    <select id="radius" name="radius">
+                        <option value="5" @selected($radius === 5)>5 km</option>
+                        <option value="10" @selected($radius === 10)>10 km</option>
+                        <option value="20" @selected($radius === 20)>20 km</option>
+                        <option value="50" @selected($radius === 50)>50 km</option>
+                        <option value="250" @selected($radius === 250)>50+ km</option>
+                    </select>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" type="submit">Vind locaties</button>
+                </div>
+            </form>
+        </aside>
+
+        <article class="card map-wrap">
+            <div id="results-map"></div>
+            <div class="map-legend">
+                <span class="map-legend-item">🏋️ Fitness / krachttraining</span>
+                <span class="map-legend-item">🥊 Boksschool</span>
+                <span class="map-legend-item">🧘 Yogastudio</span>
+                <span class="map-legend-item">🏋️‍♂️ CrossFit</span>
+                <span class="map-legend-item">📍 Overig</span>
             </div>
-        </form>
+        </article>
     </section>
 
     <section class="list">
@@ -499,17 +525,6 @@
                     <p class="stat-label">Totaal KVK met coördinaten</p>
                     <p class="stat-value">{{ number_format($totalKvkLocations, 0, ',', '.') }}</p>
                 </div>
-            </div>
-        </article>
-
-        <article class="card map-wrap">
-            <div id="results-map"></div>
-            <div class="map-legend">
-                <span class="map-legend-item">🏋️ Fitness / krachttraining</span>
-                <span class="map-legend-item">🥊 Boksschool</span>
-                <span class="map-legend-item">🧘 Yogastudio</span>
-                <span class="map-legend-item">🏋️‍♂️ CrossFit</span>
-                <span class="map-legend-item">📍 Overig</span>
             </div>
         </article>
 
