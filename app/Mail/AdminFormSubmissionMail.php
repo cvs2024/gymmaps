@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -24,10 +25,7 @@ class AdminFormSubmissionMail extends Mailable
     {
         $replyTo = [];
         if ($this->replyToAddress) {
-            $replyTo[] = [
-                'address' => $this->replyToAddress,
-                'name' => $this->replyToName,
-            ];
+            $replyTo[] = new Address($this->replyToAddress, $this->replyToName ?? '');
         }
 
         return new Envelope(

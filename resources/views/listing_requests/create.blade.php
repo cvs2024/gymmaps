@@ -8,26 +8,50 @@
     @include('partials.favicon')
     <style>
         :root {
-            --blue-900: #0f3f73;
-            --blue-700: #1f5e9a;
+            --bg: #f4f7fb;
             --ink: #11395f;
             --muted: #5c7289;
             --line: #d6e2ee;
-            --card: #f9fbfe;
-            --field: #f4f8fc;
+            --card: #ffffff;
+            --field: #f7fbff;
             --blue-accent: #0f5e88;
             --blue-accent-dark: #0c4f74;
         }
 
         * { box-sizing: border-box; }
 
+        .promo-bar {
+            width: 100%;
+            background: #dbecef;
+            border-bottom: 1px solid #cfe3e8;
+            color: #11395f;
+        }
+
+        .promo-bar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .promo-bar a {
+            color: #0f4f7c;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .promo-bar a:hover { text-decoration: underline; }
+
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
             background:
-                radial-gradient(1000px 560px at 14% 8%, rgba(49, 120, 185, 0.34), transparent 58%),
-                radial-gradient(860px 480px at 86% 92%, rgba(24, 84, 140, 0.38), transparent 56%),
-                linear-gradient(140deg, var(--blue-900), var(--blue-700));
+                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
+                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
+                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
             color: var(--ink);
             min-height: 100vh;
         }
@@ -39,11 +63,11 @@
         }
 
         .panel {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(247, 250, 254, 0.96));
-            border: 1px solid rgba(202, 218, 234, 0.9);
-            border-radius: 30px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 254, 0.97));
+            border: 1px solid rgba(202, 218, 234, 0.95);
+            border-radius: 22px;
             padding: 24px;
-            box-shadow: 0 26px 60px rgba(9, 35, 61, 0.34);
+            box-shadow: 0 18px 32px rgba(12, 47, 74, 0.14);
         }
 
         h1 {
@@ -114,7 +138,7 @@
         .form-card {
             background: var(--card);
             border: 1px solid var(--line);
-            border-radius: 22px;
+            border-radius: 16px;
             padding: 24px 26px;
             box-shadow: 0 16px 30px rgba(20, 55, 89, 0.08);
         }
@@ -156,19 +180,19 @@
 
         .btn {
             border: 0;
-            border-radius: 14px;
-            padding: 12px 20px;
+            border-radius: 10px;
+            padding: 11px 16px;
             text-decoration: none;
             font-weight: 700;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.98rem;
         }
 
         .btn-primary {
             background: linear-gradient(180deg, #1f76a8, #0c4f74);
             color: #fff;
             box-shadow: 0 14px 24px rgba(15, 94, 136, 0.3);
-            min-width: 220px;
+            min-width: 200px;
         }
 
         .btn-primary:hover { background: linear-gradient(180deg, #2b86bb, var(--blue-accent-dark)); }
@@ -187,6 +211,12 @@
     </style>
 </head>
 <body>
+<div class="promo-bar">
+    <div class="promo-bar-inner">
+        Jouw sportschool hier belichten? Dat kan.
+        <a href="{{ route('pages.contact') }}">Mail ons via het contactformulier!</a>
+    </div>
+</div>
 @include('partials.site-header')
 <div class="container">
     <div class="panel">
