@@ -86,7 +86,7 @@
         </a>
 
         <div class="gm-nav-menu">
-            <a href="{{ route('listing-requests.create') }}">Sportschool vermelden?</a>
+            <a href="{{ route('listing-requests.create') }}">Sportschool aanmelden</a>
             <a href="{{ route('gymbuddy.index') }}">Gymbuddy gezocht</a>
             <a href="{{ route('pages.personal-trainer') }}">Personal trainer</a>
             <a href="{{ route('pages.blog') }}">Blog</a>

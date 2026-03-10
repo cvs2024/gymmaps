@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class GymbuddyPostController extends Controller
 {
@@ -178,12 +179,28 @@ class GymbuddyPostController extends Controller
             'profile_photo_path' => $photoPath,
         ];
 
-        GymbuddyPost::query()->create($payload);
-        $this->notifyAdmin($payload);
+        $post = GymbuddyPost::query()->create($payload);
+        $this->notifyAdmin([
+            ...$payload,
+            'id' => $post->id,
+        ]);
 
         return redirect()
             ->to(route('gymbuddy.index') . '#actieve-oproepen')
             ->with('status', 'Je Gymbuddy oproep is geplaatst.');
+    }
+
+    public function photo(GymbuddyPost $post)
+    {
+        $path = trim((string) $post->profile_photo_path);
+        if ($path !== '' && Storage::disk('public')->exists($path)) {
+            return Storage::disk('public')->response($path);
+        }
+
+        return response($this->defaultAvatarSvg((string) $post->name), 200, [
+            'Content-Type' => 'image/svg+xml; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
     }
 
     private function resolvePostCoordinates(GymbuddyPost $post): array
@@ -248,7 +265,7 @@ class GymbuddyPostController extends Controller
     private function resolveProfilePhotoUrl(GymbuddyPost $post): string
     {
         if (is_string($post->profile_photo_path) && trim($post->profile_photo_path) !== '') {
-            return asset('storage/' . ltrim($post->profile_photo_path, '/'));
+            return route('gymbuddy.photo', $post);
         }
 
         return $this->defaultAvatarDataUri((string) $post->name);
@@ -256,11 +273,16 @@ class GymbuddyPostController extends Controller
 
     private function defaultAvatarDataUri(string $name): string
     {
+        return 'data:image/svg+xml;charset=UTF-8,' . rawurlencode($this->defaultAvatarSvg($name));
+    }
+
+    private function defaultAvatarSvg(string $name): string
+    {
         $safeName = trim($name) !== '' ? trim($name) : 'Gymbuddy';
         $safeName = htmlspecialchars($safeName, ENT_QUOTES, 'UTF-8');
         $initial = mb_strtoupper(mb_substr($safeName, 0, 1));
 
-        $svg = <<<SVG
+        return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -274,8 +296,6 @@ class GymbuddyPostController extends Controller
   <title>{$safeName}</title>
 </svg>
 SVG;
-
-        return 'data:image/svg+xml;charset=UTF-8,' . rawurlencode($svg);
     }
 
     private function haversineDistanceKm(float $latFrom, float $lngFrom, float $latTo, float $lngTo): float
@@ -315,7 +335,9 @@ SVG;
                     'Voorkeur geslacht' => $payload['gender_preference'] ?? null,
                     'Over mij' => $payload['about_you'] ?? null,
                     'Zoekopdracht' => $payload['search_message'] ?? null,
-                    'Foto' => !empty($payload['profile_photo_path']) ? asset('storage/' . ltrim((string) $payload['profile_photo_path'], '/')) : null,
+                    'Foto' => !empty($payload['profile_photo_path']) && !empty($payload['id'])
+                        ? route('gymbuddy.photo', ['post' => $payload['id']])
+                        : null,
                 ],
                 $payload['email'] ?? null,
                 $payload['name'] ?? null

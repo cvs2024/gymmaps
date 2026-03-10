@@ -26,9 +26,9 @@
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
             background:
-                radial-gradient(1000px 560px at 14% 8%, rgba(49, 120, 185, 0.34), transparent 58%),
-                radial-gradient(860px 480px at 86% 92%, rgba(24, 84, 140, 0.38), transparent 56%),
-                linear-gradient(140deg, var(--blue-900), var(--blue-700));
+                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
+                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
+                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
             color: var(--ink);
             min-height: 100vh;
         }
@@ -41,10 +41,10 @@
 
         .panel {
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(247, 250, 254, 0.96));
-            border: 1px solid rgba(202, 218, 234, 0.9);
+            border: 1px solid rgba(202, 218, 234, 0.95);
             border-radius: 30px;
             padding: 26px;
-            box-shadow: 0 26px 60px rgba(9, 35, 61, 0.34);
+            box-shadow: 0 20px 34px rgba(12, 47, 74, 0.14);
         }
 
         h1 {
@@ -87,7 +87,7 @@
             height: 16px;
             margin-top: 2px;
             border-radius: 4px;
-            border: 2px solid #98c524;
+            border: 2px solid #0f5e88;
             background: rgba(31, 118, 168, 0.15);
             flex: 0 0 16px;
         }

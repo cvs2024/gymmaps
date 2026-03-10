@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AdminFormSubmissionMail;
+use App\Mail\ListingRequestConfirmationMail;
 use App\Models\ListingRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -30,6 +31,9 @@ class ListingRequestController extends Controller
             'message' => ['nullable', 'string', 'max:2000'],
             'photo' => ['nullable', 'image', 'max:5120'],
             'logo_url' => ['nullable', 'url', 'max:5000'],
+        ], [
+            'email.required' => 'E-mailadres is verplicht zodat we je aanmelding kunnen bevestigen.',
+            'email.email' => 'Vul een geldig e-mailadres in.',
         ]);
 
         if ($request->hasFile('photo')) {
@@ -40,6 +44,7 @@ class ListingRequestController extends Controller
 
         ListingRequest::query()->create($validated);
         $this->notifyAdmin($validated);
+        $this->notifySubmitter($validated);
 
         return redirect()
             ->route('home')
@@ -75,6 +80,25 @@ class ListingRequestController extends Controller
         } catch (\Throwable $e) {
             Log::warning('Kon admin-mail voor listing request niet versturen.', [
                 'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function notifySubmitter(array $payload): void
+    {
+        $email = trim((string) ($payload['email'] ?? ''));
+        if ($email === '') {
+            return;
+        }
+
+        try {
+            Mail::to($email)->send(new ListingRequestConfirmationMail(
+                (string) ($payload['contact_name'] ?? '')
+            ));
+        } catch (\Throwable $e) {
+            Log::warning('Kon bevestigingsmail voor listing request niet versturen.', [
+                'error' => $e->getMessage(),
+                'email' => $email,
             ]);
         }
     }

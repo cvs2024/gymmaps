@@ -27,6 +27,7 @@ Route::get('/aanmelden', [ListingRequestController::class, 'create'])->name('lis
 Route::post('/aanmelden', [ListingRequestController::class, 'store'])->name('listing-requests.store');
 Route::get('/gymbuddy', [GymbuddyPostController::class, 'index'])->name('gymbuddy.index');
 Route::post('/gymbuddy', [GymbuddyPostController::class, 'store'])->name('gymbuddy.store');
+Route::get('/gymbuddy/{post}/foto', [GymbuddyPostController::class, 'photo'])->name('gymbuddy.photo');
 Route::get('/sportschool/{location}', [LocationProfileController::class, 'show'])->name('locations.show');
 
 Route::get('/admin/imports', [ImportMonitorController::class, 'index'])

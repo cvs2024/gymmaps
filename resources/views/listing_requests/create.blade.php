@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.google-site-verification')
-    <title>Gratis sportlocatie aanmelden - Gymmap.nl</title>
+    <title>Sportschool aanmelden - GymMaps.nl</title>
     @include('partials.favicon')
     <style>
         :root {
@@ -190,7 +190,7 @@
 @include('partials.site-header')
 <div class="container">
     <div class="panel">
-        <h1>Sportlocatie gratis aanmelden</h1>
+        <h1>Sportschool aanmelden</h1>
         <p class="muted">Staat jouw sportschool of sportactiviteit nog niet op GymMaps.nl? Vul dit formulier in. De aanmelding is kosteloos.</p>
 
         <div class="steps" aria-hidden="true">
@@ -227,7 +227,7 @@
 
                 <div class="grid">
                     <div class="field">
-                        <label for="email">E-mail</label>
+                    <label for="email">E-mail (verplicht)</label>
                         <input id="email" name="email" type="email" value="{{ old('email') }}" required>
                         @error('email')<div class="error">{{ $message }}</div>@enderror
                     </div>

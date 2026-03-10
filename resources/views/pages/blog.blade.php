@@ -10,7 +10,15 @@
     <style>
         :root { --bg:#f4f8fc; --card:#fff; --ink:#10263d; --muted:#4f6276; --line:#d6e2ee; --blue-accent:#0f5e88; --blue-accent-dark:#0c4f74; --blue:#0f4f7c; }
         * { box-sizing:border-box; }
-        body { margin:0; font-family:"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+        body {
+            margin:0;
+            font-family:"Segoe UI",Roboto,sans-serif;
+            color:var(--ink);
+            background:
+                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
+                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
+                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
+        }
         .container { max-width:1120px; margin:0 auto; padding:28px 16px 44px; }
         .hero { background:linear-gradient(130deg,#0f3f73,#1f5e9a); border-radius:18px; color:#fff; padding:24px 22px; margin-bottom:16px; }
         .hero h1 { margin:0 0 8px; font-size:clamp(1.7rem,3.1vw,2.3rem); }
@@ -20,7 +28,7 @@
         .featured img { width:100%; height:100%; object-fit:cover; display:block; }
         .featured::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(8,25,39,.2),rgba(8,28,46,.72)); }
         .featured .content { position:absolute; left:20px; right:20px; bottom:20px; z-index:2; color:#fff; }
-        .pill { display:inline-block; font-size:.85rem; margin-bottom:8px; background:rgba(149,193,31,.9); border-radius:999px; padding:4px 10px; }
+        .pill { display:inline-block; font-size:.85rem; margin-bottom:8px; background:rgba(15,94,136,.92); border-radius:999px; padding:4px 10px; }
         .featured h2 { margin:0; color:#fff; font-size:clamp(1.6rem,3vw,2.8rem); line-height:1.14; }
         .sidebar { background:linear-gradient(160deg,#0f5e88,#0f4f7c); border-radius:16px; padding:14px; color:#fff; border:1px solid #2b6c92; }
         .sidebar h3 { margin:0 0 10px; color:#fff; }

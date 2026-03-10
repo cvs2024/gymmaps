@@ -25,9 +25,9 @@
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
             background:
-                radial-gradient(980px 440px at 10% -12%, rgba(23, 84, 140, 0.18), transparent 60%),
-                radial-gradient(760px 380px at 90% 0%, rgba(31, 118, 168, 0.16), transparent 58%),
-                var(--bg);
+                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
+                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
+                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
             color: var(--ink);
         }
 

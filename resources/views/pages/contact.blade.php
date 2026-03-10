@@ -8,13 +8,29 @@
     @include('partials.favicon')
     <meta name="description" content="Neem contact op met GymMaps.nl voor vragen, feedback of het aanmelden van jouw sportlocatie.">
     <style>
+        :root {
+            --bg: #f4f8fc;
+            --ink: #10263d;
+            --muted: #586779;
+            --line: #d5e0ea;
+            --blue: #0f5e88;
+            --blue-dark: #0c4f74;
+        }
         * { box-sizing: border-box; }
-        body { margin:0; font-family:"Segoe UI", Roboto, sans-serif; background:#f4f8fc; color:#0b1f33; }
+        body {
+            margin:0;
+            font-family:"Segoe UI", Roboto, sans-serif;
+            background:
+                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
+                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
+                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
+            color:var(--ink);
+        }
         .container { max-width:860px; margin:0 auto; padding:28px 16px 40px; }
-        .card { background:#fff; border:1px solid #d5e0ea; border-radius:14px; padding:18px; }
+        .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:0 10px 22px rgba(12, 47, 74, .08); }
         h1 { margin:0 0 8px; }
-        p { color:#586779; }
-        .flash { margin-bottom:10px; background:#e8f7f0; color:#14563c; padding:12px; border-radius:10px; border:1px solid #bce8d4; }
+        p { color:var(--muted); }
+        .flash { margin-bottom:10px; background:#e8f3fb; color:#124265; padding:12px; border-radius:10px; border:1px solid #c5dbeb; }
         .error-box { margin-bottom:10px; background:#fff4f4; color:#8b1f1f; padding:12px; border-radius:10px; border:1px solid #f1c6c6; }
         .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         form { width: 100%; }
@@ -23,7 +39,8 @@
         input, textarea { width:100%; max-width:100%; border:1px solid #c7d8e8; border-radius:10px; padding:11px; font:inherit; background:#f7fbff; }
         .error { color:#9f1d1d; font-size:0.9rem; margin-top:4px; }
         .btn-row { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
-        .btn { display:inline-block; background:#0f5e88; color:#fff; text-decoration:none; border-radius:10px; padding:10px 14px; font-weight:600; border:0; cursor:pointer; }
+        .btn { display:inline-block; background:var(--blue); color:#fff; text-decoration:none; border-radius:10px; padding:10px 14px; font-weight:600; border:0; cursor:pointer; }
+        .btn:hover { background:var(--blue-dark); }
         .btn-ghost { background:#e7eff8; color:#163f62; margin-left:8px; }
         .btn-ghost { margin-left: 0; }
         @media (max-width:760px) { .grid { grid-template-columns:1fr; } }
