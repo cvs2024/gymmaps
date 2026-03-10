@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.google-site-verification')
     <title>Import Monitor - Gymmap</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <style>
         body { margin:0; font-family: "Segoe UI", Roboto, sans-serif; background:#f5f8fc; color:#0e2235; }
         .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; }

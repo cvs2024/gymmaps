@@ -6,8 +6,7 @@
     @include('partials.google-site-verification')
     <title>Gymmap.nl - Sportlocaties in Nederland</title>
     <meta name="description" content="GymMaps.nl helpt je snel sportscholen, personal trainers en sportlocaties in Nederland te vinden op kaart, inclusief adres, afstand en sportfilter.">
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 
@@ -17,80 +16,49 @@
             --card: #ffffff;
             --text: #0b1f33;
             --muted: #586779;
-            --accent: #95c11f;
-            --accent-dark: #7ea61a;
+            --accent: #0f5e88;
+            --accent-dark: #0c4f74;
             --border: #d5e0ea;
         }
 
         * { box-sizing: border-box; }
+
+        .promo-bar {
+            width: 100%;
+            background: #dbecef;
+            border-bottom: 1px solid #cfe3e8;
+            color: #11395f;
+        }
+
+        .promo-bar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .promo-bar a {
+            color: #0f4f7c;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .promo-bar a:hover {
+            text-decoration: underline;
+        }
+
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
             background:
                 radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
-                radial-gradient(920px 500px at 92% 4%, rgba(149, 193, 31, 0.20), transparent 58%),
-                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #edf8ef 100%);
+                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
+                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
             color: var(--text);
             min-height: 100vh;
-        }
-
-        .site-nav {
-            width: 100%;
-            background: #ffffff;
-            border-bottom: 1px solid #d9e4ee;
-        }
-
-        .site-nav-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 12px 20px;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 14px;
-            align-items: center;
-        }
-
-        .nav-logo {
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            width: 210px;
-            height: 64px;
-            overflow: hidden;
-            margin-left: -8px;
-        }
-
-        .nav-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: left center;
-            display: block;
-        }
-
-        .nav-menu {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            flex-wrap: wrap;
-            font-family: "Poppins", "Segoe UI", sans-serif;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .nav-menu a {
-            color: #fff;
-            text-decoration: none;
-            border-radius: 10px;
-            padding: 9px 13px;
-            background: var(--accent);
-            border: 1px solid var(--accent);
-            line-height: 1;
-        }
-
-        .nav-menu a:hover {
-            background: var(--accent-dark);
-            border-color: var(--accent-dark);
         }
 
         .container {
@@ -136,30 +104,33 @@
             display: grid;
             grid-template-columns: minmax(320px, 1fr) minmax(0, 2fr);
             gap: 14px;
-            align-items: start;
+            align-items: stretch;
             margin-bottom: 14px;
         }
 
-        .mini-hero {
-            background: linear-gradient(135deg, rgba(15, 63, 115, 0.95), rgba(31, 94, 154, 0.9));
-            border: 1px solid #2c6ca4;
-            color: #fff;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 12px;
-            box-shadow: 0 10px 24px rgba(10, 45, 79, 0.2);
+        .filter-intro {
+            margin: 0 0 12px;
+            color: #11395f;
+            font-size: 0.97rem;
+            font-weight: 700;
+            line-height: 1.45;
+            letter-spacing: 0.01em;
         }
 
-        .mini-hero p {
-            margin: 0;
-            color: #fff;
-            font-size: 0.97rem;
-            letter-spacing: 0.01em;
+        .filter-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .filter-panel form {
             display: grid;
             gap: 10px;
+        }
+
+        .filter-intro p {
+            margin: 0;
+            color: inherit;
         }
 
         .field-search { flex: 2 1 0; min-width: 0; position: relative; }
@@ -271,11 +242,15 @@
         .map-wrap {
             overflow: hidden;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         #results-map {
             width: 100%;
             min-height: 420px;
+            flex: 1 1 auto;
             border-radius: 14px;
         }
 
@@ -298,6 +273,16 @@
             padding: 4px 10px;
             font-size: 0.84rem;
             color: #244a68;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+        }
+
+        .map-legend-item.active {
+            border-color: #1e5f95;
+            background: #e9f2fb;
+            color: #0f4f7c;
+            box-shadow: 0 4px 10px rgba(20, 79, 124, 0.18);
         }
 
         .location-name {
@@ -409,14 +394,6 @@
         }
 
         @media (max-width: 760px) {
-            .site-nav-inner {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            .nav-menu {
-                justify-content: flex-start;
-                flex-wrap: wrap;
-            }
             .top-layout {
                 grid-template-columns: 1fr;
             }
@@ -428,23 +405,13 @@
     </style>
 </head>
 <body>
-<nav class="site-nav">
-    <div class="site-nav-inner">
-        <a class="nav-logo" href="{{ route('home') }}">
-            <img src="{{ asset('logo/gymmaps-logo.png') }}" alt="Gymmap logo">
-        </a>
-
-        <div class="nav-menu">
-            <a href="{{ route('listing-requests.create') }}">Sportschool vermelden?</a>
-            <a href="{{ route('gymbuddy.index') }}">Gymbuddy gezocht</a>
-            <a href="{{ route('pages.personal-trainer') }}">Personal trainer</a>
-            <a href="{{ route('pages.blog') }}">Blog</a>
-            <a href="{{ route('pages.faq') }}">FAQ</a>
-            <a href="{{ route('pages.contact') }}">Contact</a>
-            <a href="{{ route('login') }}">Inloggen</a>
-        </div>
+<div class="promo-bar">
+    <div class="promo-bar-inner">
+        Jouw sportschool hier belichten? Dat kan.
+        <a href="{{ route('pages.contact') }}">Mail ons via het contactformulier!</a>
     </div>
-</nav>
+</div>
+@include('partials.site-header')
 
 <div class="container">
 
@@ -452,12 +419,11 @@
         <div class="flash">{{ session('status') }}</div>
     @endif
 
-    <section class="mini-hero">
-        <p>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</p>
-    </section>
-
     <section class="top-layout">
         <aside class="card filter-panel">
+            <div class="filter-intro">
+                <p>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</p>
+            </div>
             <form method="GET" action="{{ route('home') }}">
                 <div class="field-search">
                     <label class="field-label" for="q">Zoek op locatie / adres / postcode</label>
@@ -498,11 +464,12 @@
         <article class="card map-wrap">
             <div id="results-map"></div>
             <div class="map-legend">
-                <span class="map-legend-item">🏋️ Fitness / krachttraining</span>
-                <span class="map-legend-item">🥊 Boksschool</span>
-                <span class="map-legend-item">🧘 Yogastudio</span>
-                <span class="map-legend-item">🏋️‍♂️ CrossFit</span>
-                <span class="map-legend-item">📍 Overig</span>
+                <button type="button" class="map-legend-item active" data-category="all">🗺️ Alles</button>
+                <button type="button" class="map-legend-item" data-category="fitness">🏋️ Fitness / krachttraining</button>
+                <button type="button" class="map-legend-item" data-category="boxing">🥊 Boksschool</button>
+                <button type="button" class="map-legend-item" data-category="yoga">🧘 Yogastudio</button>
+                <button type="button" class="map-legend-item" data-category="crossfit">🏋️‍♂️ CrossFit</button>
+                <button type="button" class="map-legend-item" data-category="other">📍 Overig</button>
             </div>
         </article>
     </section>
@@ -514,19 +481,6 @@
                 <p class="muted">Er zijn nog geen KVK sportscholen met coördinaten geïmporteerd. Tijdelijk tonen we alle beschikbare locaties met coördinaten.</p>
             </article>
         @endif
-
-        <article class="card">
-            <div class="stats">
-                <div class="stat-item">
-                    <p class="stat-label">Getoonde KVK-sportscholen</p>
-                    <p class="stat-value">{{ number_format($results->count(), 0, ',', '.') }}</p>
-                </div>
-                <div class="stat-item">
-                    <p class="stat-label">Totaal KVK met coördinaten</p>
-                    <p class="stat-value">{{ number_format($totalKvkLocations, 0, ',', '.') }}</p>
-                </div>
-            </div>
-        </article>
 
         @if($query !== '' && !$center && $results->isEmpty())
             <article class="card">
@@ -860,6 +814,8 @@
             bounds.extend(center);
 
             const markers = [];
+            let clustererInstance = null;
+            let activeCategory = 'all';
 
             locations.forEach((location) => {
                 const category = getCategory(location.sports);
@@ -936,7 +892,54 @@
                     },
                 };
 
-                new markerClusterer.MarkerClusterer({ map, markers, renderer: clusterRenderer });
+                clustererInstance = new markerClusterer.MarkerClusterer({ map, markers, renderer: clusterRenderer });
+            }
+
+            const legendItems = Array.from(document.querySelectorAll('.map-legend-item'));
+
+            const fitVisibleBounds = () => {
+                const visibleMarkers = markers.filter((marker) => marker.getVisible());
+                if (!visibleMarkers.length) {
+                    return;
+                }
+
+                const filteredBounds = new google.maps.LatLngBounds();
+                visibleMarkers.forEach((marker) => filteredBounds.extend(marker.getPosition()));
+                map.fitBounds(filteredBounds);
+            };
+
+            const applyLegendFilter = (category) => {
+                activeCategory = category;
+                legendItems.forEach((item) => {
+                    item.classList.toggle('active', item.dataset.category === category);
+                });
+
+                markers.forEach((marker) => {
+                    const isVisible = category === 'all' || marker.gymmapsCategory === category;
+                    marker.setVisible(isVisible);
+                });
+
+                if (clustererInstance) {
+                    const visibleMarkers = markers.filter((marker) => marker.getVisible());
+                    clustererInstance.clearMarkers();
+                    if (visibleMarkers.length > 1) {
+                        clustererInstance.addMarkers(visibleMarkers);
+                    }
+                }
+
+                fitVisibleBounds();
+            };
+
+            legendItems.forEach((item) => {
+                item.addEventListener('click', () => {
+                    const category = item.dataset.category || 'all';
+                    applyLegendFilter(category);
+                });
+            });
+
+            const initialLegend = legendItems.find((item) => item.dataset.category === activeCategory);
+            if (initialLegend) {
+                initialLegend.classList.add('active');
             }
         }
     </script>
@@ -974,28 +977,36 @@
                 }).addTo(map).bindPopup('Zoekcentrum');
             }
 
-            const bounds = [];
-            bounds.push(center);
+            const markerRefs = [];
 
             const getCategory = (sports) => {
                 const joined = Array.isArray(sports) ? sports.join(' ').toLowerCase() : '';
-                if (joined.includes('crossfit')) return { emoji: '🏋️‍♂️' };
-                if (joined.includes('bok')) return { emoji: '🥊' };
-                if (joined.includes('yoga')) return { emoji: '🧘' };
-                if (joined.includes('fitness') || joined.includes('kracht')) return { emoji: '🏋️' };
-                return { emoji: '📍' };
+                if (joined.includes('crossfit')) return 'crossfit';
+                if (joined.includes('bok')) return 'boxing';
+                if (joined.includes('yoga')) return 'yoga';
+                if (joined.includes('fitness') || joined.includes('kracht')) return 'fitness';
+                return 'other';
+            };
+
+            const categoryMeta = {
+                fitness: { emoji: '🏋️' },
+                boxing: { emoji: '🥊' },
+                yoga: { emoji: '🧘' },
+                crossfit: { emoji: '🏋️‍♂️' },
+                other: { emoji: '📍' },
             };
 
             locations.forEach((location) => {
                 const category = getCategory(location.sports);
                 const icon = L.divIcon({
-                    html: `<div style="width:34px;height:34px;border-radius:50%;background:#0f5f8b;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.3);">${category.emoji}</div>`,
+                    html: `<div style="width:34px;height:34px;border-radius:50%;background:#0f5f8b;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.3);">${(categoryMeta[category] || categoryMeta.other).emoji}</div>`,
                     className: '',
                     iconSize: [34, 34],
                     iconAnchor: [17, 17],
                 });
 
                 const marker = L.marker([location.lat, location.lng], { icon }).addTo(map);
+                marker.gymmapsCategory = category;
                 const distanceLine = location.distance !== null ? `<br>Afstand: ${location.distance.toFixed(1)} km` : '';
                 const photoCandidate = location.logo_url || location.photo_url || location.fallback_photo_url;
                 const photoLine = photoCandidate
@@ -1005,12 +1016,45 @@
                     ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
                     : '';
                 marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${escapeHtml(location.address)}${distanceLine}${photoLine}${detailLink}`);
-                bounds.push([location.lat, location.lng]);
+                markerRefs.push(marker);
             });
 
-            if (bounds.length > 1) {
+            const legendItems = Array.from(document.querySelectorAll('.map-legend-item'));
+
+            const fitVisibleBounds = () => {
+                const visible = markerRefs.filter((marker) => map.hasLayer(marker));
+                if (!visible.length) {
+                    return;
+                }
+                const bounds = L.latLngBounds(visible.map((marker) => marker.getLatLng()));
                 map.fitBounds(bounds, { padding: [28, 28] });
-            }
+            };
+
+            const applyLegendFilter = (category) => {
+                legendItems.forEach((item) => {
+                    item.classList.toggle('active', item.dataset.category === category);
+                });
+
+                markerRefs.forEach((marker) => {
+                    const match = category === 'all' || marker.gymmapsCategory === category;
+                    if (match && !map.hasLayer(marker)) {
+                        marker.addTo(map);
+                    }
+                    if (!match && map.hasLayer(marker)) {
+                        map.removeLayer(marker);
+                    }
+                });
+
+                fitVisibleBounds();
+            };
+
+            legendItems.forEach((item) => {
+                item.addEventListener('click', () => {
+                    applyLegendFilter(item.dataset.category || 'all');
+                });
+            });
+
+            applyLegendFilter('all');
         })();
     </script>
 @endif

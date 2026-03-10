@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.google-site-verification')
     <title>Meld jouw sportlocatie aan op GymMaps.nl</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <meta name="description" content="Maak een bedrijfsprofiel aan op GymMaps.nl en word zichtbaar voor sporters in jouw regio.">
     <style>
         :root {
@@ -17,8 +16,8 @@
             --line: #d6e2ee;
             --card: #f9fbfe;
             --field: #f4f8fc;
-            --green: #95c11f;
-            --green-dark: #7ea61a;
+            --blue-accent: #0f5e88;
+            --blue-accent-dark: #0c4f74;
         }
 
         * { box-sizing: border-box; }
@@ -89,7 +88,7 @@
             margin-top: 2px;
             border-radius: 4px;
             border: 2px solid #98c524;
-            background: rgba(149, 193, 31, 0.15);
+            background: rgba(31, 118, 168, 0.15);
             flex: 0 0 16px;
         }
 
@@ -148,13 +147,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(180deg, #9ecc21, #7ea61a);
+            background: linear-gradient(180deg, #1f76a8, #0c4f74);
             color: #fff;
-            box-shadow: 0 14px 24px rgba(126, 166, 26, 0.3);
+            box-shadow: 0 14px 24px rgba(15, 94, 136, 0.3);
             min-width: 220px;
         }
 
-        .btn-primary:hover { background: linear-gradient(180deg, #a8d329, var(--green-dark)); }
+        .btn-primary:hover { background: linear-gradient(180deg, #2b86bb, var(--blue-accent-dark)); }
 
         .btn-ghost {
             background: #e6eef7;

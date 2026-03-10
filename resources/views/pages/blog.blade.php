@@ -6,10 +6,9 @@
     @include('partials.google-site-verification')
     <title>Blogs</title>
     <meta name="description" content="Lees blogs van GymMaps.nl over sportscholen, gymbuddy's en personal trainers in Nederland.">
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <style>
-        :root { --bg:#f4f8fc; --card:#fff; --ink:#10263d; --muted:#4f6276; --line:#d6e2ee; --green:#95c11f; --green-dark:#7ea61a; --blue:#0f4f7c; }
+        :root { --bg:#f4f8fc; --card:#fff; --ink:#10263d; --muted:#4f6276; --line:#d6e2ee; --blue-accent:#0f5e88; --blue-accent-dark:#0c4f74; --blue:#0f4f7c; }
         * { box-sizing:border-box; }
         body { margin:0; font-family:"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
         .container { max-width:1120px; margin:0 auto; padding:28px 16px 44px; }
@@ -35,8 +34,8 @@
         .card img { width:100%; height:96px; border-radius:8px; object-fit:cover; background:#edf3fa; }
         .card strong { display:block; margin-bottom:6px; line-height:1.25; }
         .card p { margin:0; font-size:.9rem; color:#58708a; line-height:1.35; }
-        .btn { display:inline-block; margin-top:16px; border-radius:10px; text-decoration:none; padding:10px 14px; font-weight:600; background:var(--green); color:#fff; }
-        .btn:hover { background:var(--green-dark); }
+        .btn { display:inline-block; margin-top:16px; border-radius:10px; text-decoration:none; padding:10px 14px; font-weight:600; background:var(--blue-accent); color:#fff; }
+        .btn:hover { background:var(--blue-accent-dark); }
         @media (max-width:980px){ .showcase{ grid-template-columns:1fr;} }
         @media (max-width:640px){ .grid{grid-template-columns:1fr;} .card{grid-template-columns:1fr;} .featured{min-height:320px;} }
     </style>

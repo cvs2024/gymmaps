@@ -6,8 +6,7 @@
     @include('partials.google-site-verification')
     <title>Waarom sporten met een gymbuddy zo effectief is - GymMaps.nl</title>
     <meta name="description" content="Waarom trainen met een gymbuddy zorgt voor meer motivatie en betere resultaten.">
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <style>
         body{margin:0;font-family:"Segoe UI",Roboto,sans-serif;background:#f4f8fc;color:#12293f}
         .container{max-width:920px;margin:0 auto;padding:26px 16px 44px}
@@ -18,7 +17,7 @@
         h2{margin:16px 0 8px;color:#123f6a;font-size:1.1rem}
         p,li{color:#566f87;line-height:1.58}
         ul{margin:0 0 10px 18px;padding:0}
-        .btn{display:inline-block;margin-top:14px;text-decoration:none;background:#95c11f;color:#fff;border-radius:10px;padding:10px 14px;font-weight:600}
+        .btn{display:inline-block;margin-top:14px;text-decoration:none;background:#0f5e88;color:#fff;border-radius:10px;padding:10px 14px;font-weight:600}
     </style>
 </head>
 <body>

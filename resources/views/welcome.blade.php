@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.google-site-verification')
     <title>{{ config('app.name', 'Gymmaps') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <style>
         :root {
             --bg: #f4f8fc;

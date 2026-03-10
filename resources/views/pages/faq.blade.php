@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.google-site-verification')
     <title>Veelgestelde vragen</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <meta name="description" content="Veelgestelde vragen over GymMaps.nl: sportscholen zoeken, gymbuddy, personal trainers en bedrijfsprofielen.">
     <style>
         :root {
@@ -15,8 +14,8 @@
             --ink: #10263d;
             --muted: #4f6276;
             --line: #d6e2ee;
-            --brand: #95c11f;
-            --brand-dark: #7ea61a;
+            --brand: #0f5e88;
+            --brand-dark: #0c4f74;
             --blue: #123f6a;
         }
 
@@ -27,7 +26,7 @@
             font-family: "Segoe UI", Roboto, sans-serif;
             background:
                 radial-gradient(980px 440px at 10% -12%, rgba(23, 84, 140, 0.18), transparent 60%),
-                radial-gradient(760px 380px at 90% 0%, rgba(149, 193, 31, 0.16), transparent 58%),
+                radial-gradient(760px 380px at 90% 0%, rgba(31, 118, 168, 0.16), transparent 58%),
                 var(--bg);
             color: var(--ink);
         }

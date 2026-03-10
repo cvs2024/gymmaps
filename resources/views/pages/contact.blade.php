@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.google-site-verification')
     <title>Contact - GymMaps.nl</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <meta name="description" content="Neem contact op met GymMaps.nl voor vragen, feedback of het aanmelden van jouw sportlocatie.">
     <style>
         * { box-sizing: border-box; }
@@ -24,7 +23,7 @@
         input, textarea { width:100%; max-width:100%; border:1px solid #c7d8e8; border-radius:10px; padding:11px; font:inherit; background:#f7fbff; }
         .error { color:#9f1d1d; font-size:0.9rem; margin-top:4px; }
         .btn-row { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
-        .btn { display:inline-block; background:#95c11f; color:#fff; text-decoration:none; border-radius:10px; padding:10px 14px; font-weight:600; border:0; cursor:pointer; }
+        .btn { display:inline-block; background:#0f5e88; color:#fff; text-decoration:none; border-radius:10px; padding:10px 14px; font-weight:600; border:0; cursor:pointer; }
         .btn-ghost { background:#e7eff8; color:#163f62; margin-left:8px; }
         .btn-ghost { margin-left: 0; }
         @media (max-width:760px) { .grid { grid-template-columns:1fr; } }

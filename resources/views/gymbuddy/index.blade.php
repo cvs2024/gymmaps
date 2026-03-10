@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @include('partials.google-site-verification')
     <title>Gymbuddy zoeken - Gymmap.nl</title>
-    <link rel="icon" type="image/png" href="{{ asset('logo/gymmaps-logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('logo/gymmaps-logo.png') }}">
+    @include('partials.favicon')
     <style>
         :root {
             --blue-900: #0f3f73;
@@ -16,8 +15,8 @@
             --line: #d6e2ee;
             --card: #f9fbfe;
             --field: #f4f8fc;
-            --green: #95c11f;
-            --green-dark: #7ea61a;
+            --blue-accent: #0f5e88;
+            --blue-accent-dark: #0c4f74;
         }
         * { box-sizing:border-box; }
         body {
@@ -39,7 +38,7 @@
         input, select, textarea { width:100%; border:1px solid #c7d8e8; border-radius:12px; padding:12px; font:inherit; background:var(--field); }
         .field { margin-bottom:12px; }
         .btn { border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; }
-        .btn-primary { background:linear-gradient(180deg, #9ecc21, #7ea61a); color:#fff; }
+        .btn-primary { background:linear-gradient(180deg, #1f76a8, #0c4f74); color:#fff; }
         .btn-ghost { background:#e9f0f7; color:#174266; }
         .row { display:flex; gap:10px; flex-wrap:wrap; }
         .error { color:#9f1d1d; font-size:0.9rem; margin-top:4px; }
@@ -56,8 +55,8 @@
         .steps::before { content:""; position:absolute; left:8%; right:8%; top:20px; height:3px; background:#d2dfeb; border-radius:999px; z-index:0; }
         .step { position:relative; z-index:1; text-align:center; color:#668097; font-weight:600; }
         .step-dot { width:42px; height:42px; margin:0 auto 8px; border-radius:50%; border:2px solid #bed0e3; background:#ecf3fa; display:grid; place-items:center; font-size:1.35rem; font-weight:700; }
-        .step.active { color:#4a8f19; }
-        .step.active .step-dot { border-color:var(--green); background:var(--green); color:#fff; box-shadow:0 8px 16px rgba(126,166,26,.34); }
+        .step.active { color:#0f5e88; }
+        .step.active .step-dot { border-color:var(--blue-accent); background:var(--blue-accent); color:#fff; box-shadow:0 8px 16px rgba(15, 94, 136, .34); }
         .form-card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:22px 24px; }
         @media (max-width: 820px) { .grid { grid-template-columns:1fr; } }
     </style>
