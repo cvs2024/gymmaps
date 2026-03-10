@@ -720,6 +720,7 @@
     <script>
         function initGymmapResultsMap() {
             const hasSearchCenter = {{ $hasSearchCenter ? 'true' : 'false' }};
+            const hasLocationQuery = {{ $query !== '' ? 'true' : 'false' }};
             const center = {
                 lat: {{ $mapCenterLat }},
                 lng: {{ $mapCenterLng }},
@@ -816,12 +817,13 @@
             const markers = [];
             let clustererInstance = null;
             let activeCategory = 'all';
+            const shouldShowMarkers = hasLocationQuery;
 
             locations.forEach((location) => {
                 const category = getCategory(location.sports);
                 const marker = new google.maps.Marker({
                     position: { lat: location.lat, lng: location.lng },
-                    map,
+                    map: shouldShowMarkers ? map : null,
                     title: location.name,
                     icon: markerIcon(category),
                     label: {
@@ -834,7 +836,9 @@
                 marker.gymmapsCategory = category;
                 markers.push(marker);
 
-                bounds.extend(marker.getPosition());
+                if (shouldShowMarkers) {
+                    bounds.extend(marker.getPosition());
+                }
 
                 marker.addListener("click", () => {
                     const distanceLine = location.distance !== null
@@ -853,11 +857,11 @@
                 });
             });
 
-            if (locations.length > 0) {
+            if (shouldShowMarkers && locations.length > 0) {
                 map.fitBounds(bounds);
             }
 
-            if (window.markerClusterer && markers.length > 1) {
+            if (shouldShowMarkers && window.markerClusterer && markers.length > 1) {
                 const clusterRenderer = {
                     render({ count, position, markers: clusterMarkers }) {
                         const counts = clusterMarkers.reduce((acc, marker) => {
@@ -915,7 +919,7 @@
                 });
 
                 markers.forEach((marker) => {
-                    const isVisible = category === 'all' || marker.gymmapsCategory === category;
+                    const isVisible = shouldShowMarkers && (category === 'all' || marker.gymmapsCategory === category);
                     marker.setVisible(isVisible);
                 });
 
@@ -941,6 +945,11 @@
             if (initialLegend) {
                 initialLegend.classList.add('active');
             }
+
+            if (!shouldShowMarkers) {
+                markers.forEach((marker) => marker.setVisible(false));
+                legendItems.forEach((item) => item.classList.remove('active'));
+            }
         }
     </script>
     <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
@@ -951,6 +960,7 @@
     <script>
         (function initGymmapLeafletFallback() {
             const hasSearchCenter = {{ $hasSearchCenter ? 'true' : 'false' }};
+            const hasLocationQuery = {{ $query !== '' ? 'true' : 'false' }};
             const center = [{{ $mapCenterLat }}, {{ $mapCenterLng }}];
             const locations = @json($mapLocations);
             const escapeHtml = (value) =>
@@ -1005,7 +1015,10 @@
                     iconAnchor: [17, 17],
                 });
 
-                const marker = L.marker([location.lat, location.lng], { icon }).addTo(map);
+                const marker = L.marker([location.lat, location.lng], { icon });
+                if (hasLocationQuery) {
+                    marker.addTo(map);
+                }
                 marker.gymmapsCategory = category;
                 const distanceLine = location.distance !== null ? `<br>Afstand: ${location.distance.toFixed(1)} km` : '';
                 const photoCandidate = location.logo_url || location.photo_url || location.fallback_photo_url;
@@ -1036,7 +1049,7 @@
                 });
 
                 markerRefs.forEach((marker) => {
-                    const match = category === 'all' || marker.gymmapsCategory === category;
+                    const match = hasLocationQuery && (category === 'all' || marker.gymmapsCategory === category);
                     if (match && !map.hasLayer(marker)) {
                         marker.addTo(map);
                     }
@@ -1054,7 +1067,7 @@
                 });
             });
 
-            applyLegendFilter('all');
+            applyLegendFilter(hasLocationQuery ? 'all' : 'none');
         })();
     </script>
 @endif

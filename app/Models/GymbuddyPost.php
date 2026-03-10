@@ -9,6 +9,7 @@ class GymbuddyPost extends Model
     protected $fillable = [
         'name',
         'email',
+        'profile_photo_path',
         'sport',
         'days_per_week',
         'address',
