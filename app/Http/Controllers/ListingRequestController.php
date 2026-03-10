@@ -43,19 +43,25 @@ class ListingRequestController extends Controller
         unset($validated['photo']);
 
         ListingRequest::query()->create($validated);
-        $this->notifyAdmin($validated);
-        $this->notifySubmitter($validated);
+        $adminMailError = $this->notifyAdmin($validated);
+        $submitterMailError = $this->notifySubmitter($validated);
+
+        if ($adminMailError || $submitterMailError) {
+            return redirect()
+                ->route('home')
+                ->with('status', 'Je aanmelding is opgeslagen, maar er was een probleem met het versturen van e-mail. Probeer het later opnieuw of neem contact op.');
+        }
 
         return redirect()
             ->route('home')
             ->with('status', 'Bedankt! Je aanmelding is ontvangen en wordt snel gecontroleerd.');
     }
 
-    private function notifyAdmin(array $payload): void
+    private function notifyAdmin(array $payload): ?string
     {
         $adminAddress = (string) config('mail.admin.address');
         if ($adminAddress === '') {
-            return;
+            return null;
         }
 
         try {
@@ -77,29 +83,33 @@ class ListingRequestController extends Controller
                 $payload['email'] ?? null,
                 $payload['contact_name'] ?? null
             ));
+            return null;
         } catch (\Throwable $e) {
             Log::warning('Kon admin-mail voor listing request niet versturen.', [
                 'error' => $e->getMessage(),
             ]);
+            return $e->getMessage();
         }
     }
 
-    private function notifySubmitter(array $payload): void
+    private function notifySubmitter(array $payload): ?string
     {
         $email = trim((string) ($payload['email'] ?? ''));
         if ($email === '') {
-            return;
+            return null;
         }
 
         try {
             Mail::to($email)->send(new ListingRequestConfirmationMail(
                 (string) ($payload['contact_name'] ?? '')
             ));
+            return null;
         } catch (\Throwable $e) {
             Log::warning('Kon bevestigingsmail voor listing request niet versturen.', [
                 'error' => $e->getMessage(),
                 'email' => $email,
             ]);
+            return $e->getMessage();
         }
     }
 }
