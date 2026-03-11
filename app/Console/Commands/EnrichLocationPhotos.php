@@ -14,7 +14,7 @@ class EnrichLocationPhotos extends Command
                             {--sleep-ms=120 : Wachttijd tussen requests in ms}
                             {--force : Ook records met bestaande photo_url opnieuw proberen}';
 
-    protected $description = 'Verrijk locaties met een passende Google Places foto.';
+    protected $description = 'Verrijk locaties met Google Places foto en openingstijden.';
 
     public function handle(GooglePlacesPhotoService $photoService): int
     {
@@ -29,7 +29,9 @@ class EnrichLocationPhotos extends Command
             ->when($source !== '', fn ($q) => $q->where('source', $source))
             ->when(!$force, fn ($q) => $q->where(function ($sub) {
                 $sub->whereNull('photo_url')
-                    ->orWhere('photo_url', '');
+                    ->orWhere('photo_url', '')
+                    ->orWhereNull('opening_hours_json')
+                    ->orWhere('opening_hours_json', '');
             }))
             ->orderBy('id')
             ->limit($limit);
@@ -44,7 +46,7 @@ class EnrichLocationPhotos extends Command
         $skipped = 0;
 
         foreach ($locations as $location) {
-            $photoUrl = $photoService->findPhotoUrl(
+            $profile = $photoService->findPlaceProfile(
                 (string) $location->name,
                 (string) $location->address,
                 (string) $location->postcode,
@@ -53,12 +55,29 @@ class EnrichLocationPhotos extends Command
                 (float) $location->longitude
             );
 
-            if ($photoUrl === null) {
+            if (!is_array($profile)) {
                 $skipped++;
                 continue;
             }
 
-            $location->update(['photo_url' => $photoUrl]);
+            $payload = [];
+            if (is_string($profile['photo_url'] ?? null) && trim((string) $profile['photo_url']) !== '') {
+                $payload['photo_url'] = $profile['photo_url'];
+            }
+            if (is_string($profile['place_id'] ?? null) && trim((string) $profile['place_id']) !== '') {
+                $payload['google_place_id'] = $profile['place_id'];
+            }
+            if (is_array($profile['opening_hours_weekday_text'] ?? null) && $profile['opening_hours_weekday_text'] !== []) {
+                $payload['opening_hours_json'] = json_encode($profile['opening_hours_weekday_text'], JSON_UNESCAPED_UNICODE);
+                $payload['opening_hours_updated_at'] = now();
+            }
+
+            if ($payload === []) {
+                $skipped++;
+                continue;
+            }
+
+            $location->update($payload);
             $updated++;
 
             if ($sleepMs > 0) {

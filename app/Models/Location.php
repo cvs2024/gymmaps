@@ -18,6 +18,9 @@ class Location extends Model
         'phone',
         'photo_url',
         'logo_url',
+        'google_place_id',
+        'opening_hours_json',
+        'opening_hours_updated_at',
         'source',
         'external_id',
         'imported_at',
@@ -25,6 +28,8 @@ class Location extends Model
     ];
 
     protected $casts = [
+        'opening_hours_json' => 'array',
+        'opening_hours_updated_at' => 'datetime',
         'imported_at' => 'datetime',
         'last_seen_at' => 'datetime',
     ];

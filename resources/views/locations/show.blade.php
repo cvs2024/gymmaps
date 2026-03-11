@@ -43,8 +43,17 @@
             </div>
 
             <div class="toolbar">
-                @if($location->website)
-                    <a class="btn btn-primary" href="{{ $location->website }}" target="_blank" rel="noopener">Naar officiële website</a>
+                @if($websiteUrl)
+                    <a class="btn btn-primary" href="{{ $websiteUrl }}" target="_blank" rel="noopener">Naar officiële website</a>
+                @else
+                    <a
+                        class="btn btn-primary"
+                        href="{{ $googleSearchUrl }}"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        Zoek website in Google
+                    </a>
                 @endif
                 <a class="btn btn-ghost" href="{{ route('home') }}">Terug naar overzicht</a>
             </div>

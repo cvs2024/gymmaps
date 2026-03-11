@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Location;
 use App\Models\Sport;
 use App\Services\GoogleGeocodingService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class SearchController extends Controller
 {
@@ -22,6 +24,7 @@ class SearchController extends Controller
         $baseQuery = Location::query()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude');
+        $this->applyPublicLocationExclusions($baseQuery);
 
         $hasKvk = (clone $baseQuery)
             ->where('source', 'kvk')
@@ -57,6 +60,7 @@ class SearchController extends Controller
             ->values();
 
         $radius = in_array($radius, [5, 10, 20, 50, 250], true) ? $radius : 10;
+        $applyFitnessWhitelist = $this->shouldApplyFitnessOfficialWhitelist($selectedSports, $sports);
 
         $center = null;
         $googleMapsKey = (string) config('services.google_maps.key');
@@ -82,6 +86,7 @@ class SearchController extends Controller
                             ->orWhere('address', 'like', "%{$query}%")
                             ->orWhere('name', 'like', "%{$query}%");
                     })
+                    ->tap(fn (Builder $builder) => $this->applyPublicLocationExclusions($builder))
                     ->first();
             }
         }
@@ -96,10 +101,15 @@ class SearchController extends Controller
                     $sportQuery->whereIn('sports.id', $selectedSports);
                 });
             });
+        if ($applyFitnessWhitelist) {
+            $this->applyFitnessOfficialWhitelist($locationsQuery);
+        }
+        $this->applyPublicLocationExclusions($locationsQuery);
         $totalKvkLocations = Location::query()
             ->where('source', 'kvk')
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->tap(fn (Builder $builder) => $this->applyPublicLocationExclusions($builder))
             ->count();
         $isUsingFallbackSource = false;
 
@@ -111,9 +121,13 @@ class SearchController extends Controller
                 ->whereNotNull('longitude')
                 ->when($selectedSports->isNotEmpty(), function ($q) use ($selectedSports) {
                     $q->whereHas('sports', function ($sportQuery) use ($selectedSports) {
-                        $sportQuery->whereIn('sports.id', $selectedSports);
-                    });
+                    $sportQuery->whereIn('sports.id', $selectedSports);
                 });
+            });
+            if ($applyFitnessWhitelist) {
+                $this->applyFitnessOfficialWhitelist($locationsQuery);
+            }
+            $this->applyPublicLocationExclusions($locationsQuery);
         }
 
         $results = collect();
@@ -138,8 +152,19 @@ class SearchController extends Controller
                     $location->display_photo_url = $this->resolvePhotoUrl($location, $googleMapsKey);
                     $location->display_logo_url = $this->resolveLogoUrl($location);
                     $location->fallback_photo_url = $this->defaultPhotoDataUri($location->name);
+                    $openingHours = $this->resolveOpeningHoursForDisplay($location);
+                    $location->opening_hours_today = $openingHours['today'];
+                    $location->opening_hours_week = $openingHours['week'];
 
                     return $location;
+                })
+                ->unique(function (Location $location) {
+                    return mb_strtolower(trim(implode('|', [
+                        (string) $location->name,
+                        (string) $location->postcode,
+                        (string) $location->city,
+                        (string) $location->address,
+                    ])));
                 })
                 ->values();
         } else {
@@ -160,8 +185,19 @@ class SearchController extends Controller
                     $location->display_photo_url = $this->resolvePhotoUrl($location, $googleMapsKey);
                     $location->display_logo_url = $this->resolveLogoUrl($location);
                     $location->fallback_photo_url = $this->defaultPhotoDataUri($location->name);
+                    $openingHours = $this->resolveOpeningHoursForDisplay($location);
+                    $location->opening_hours_today = $openingHours['today'];
+                    $location->opening_hours_week = $openingHours['week'];
 
                     return $location;
+                })
+                ->unique(function (Location $location) {
+                    return mb_strtolower(trim(implode('|', [
+                        (string) $location->name,
+                        (string) $location->postcode,
+                        (string) $location->city,
+                        (string) $location->address,
+                    ])));
                 })
                 ->values();
         }
@@ -238,6 +274,11 @@ class SearchController extends Controller
             return trim($location->logo_url);
         }
 
+        $brandLogo = $this->resolveOfficialGymBrandLogo($location);
+        if ($brandLogo !== null) {
+            return $brandLogo;
+        }
+
         if (!is_string($location->website) || trim($location->website) === '') {
             return null;
         }
@@ -253,6 +294,98 @@ class SearchController extends Controller
         }
 
         return 'https://www.google.com/s2/favicons?domain='.rawurlencode($host).'&sz=256';
+    }
+
+    private function resolveOfficialGymBrandLogo(Location $location): ?string
+    {
+        $name = mb_strtolower(trim((string) $location->name));
+        if ($name === '') {
+            return null;
+        }
+
+        $brandDomains = [
+            'basic-fit' => [
+                'keywords' => ['basic fit', 'basic-fit', 'basicfit'],
+                'domain' => 'basic-fit.com',
+                'logo_file' => 'basic-fit.png',
+            ],
+            'trainmore' => [
+                'keywords' => ['trainmore'],
+                'domain' => 'trainmore.nl',
+                'logo_file' => 'trainmore.png',
+            ],
+            'fit-for-free' => [
+                'keywords' => ['fit for free', 'fitforfree', 'fit-for-free'],
+                'domain' => 'fitforfree.nl',
+                'logo_file' => 'fit-for-free.png',
+            ],
+            'sportcity' => [
+                'keywords' => ['sportcity'],
+                'domain' => 'sportcity.nl',
+                'logo_file' => 'sportcity.png',
+            ],
+            'mylife' => [
+                'keywords' => ['mylife', 'my life'],
+                'domain' => 'mylife.nl',
+                'logo_file' => 'mylife.png',
+            ],
+            'anytime-fitness' => [
+                'keywords' => ['anytime fitness', 'anytimefitness'],
+                'domain' => 'anytimefitness.nl',
+                'logo_file' => 'anytime-fitness.png',
+            ],
+            'biggym' => [
+                'keywords' => ['biggym', 'big gym'],
+                'domain' => 'biggym.nl',
+                'logo_file' => 'biggym.png',
+            ],
+            'invictus' => [
+                'keywords' => ['invictus'],
+                'domain' => 'invictusgym.nl',
+                'logo_file' => 'invictus.png',
+            ],
+            'club-pellikaan' => [
+                'keywords' => ['club pellikaan', 'clubpellikaan'],
+                'domain' => 'clubpellikaan.nl',
+                'logo_file' => 'club-pellikaan.png',
+            ],
+            'snap-fitness' => [
+                'keywords' => ['snap fitness', 'snapfitness'],
+                'domain' => 'snapfitness.com',
+                'logo_file' => 'snap-fitness.png',
+            ],
+            'david-lloyd' => [
+                'keywords' => ['david lloyd', 'davidlloyd'],
+                'domain' => 'davidlloyd.nl',
+                'logo_file' => 'david-lloyd.png',
+            ],
+            'sportplaza' => [
+                'keywords' => ['sportplaza'],
+                'domain' => 'sportplaza.nl',
+                'logo_file' => 'sportplaza.png',
+            ],
+        ];
+
+        foreach ($brandDomains as $brand) {
+            foreach ($brand['keywords'] as $keyword) {
+                if (!str_contains($name, $keyword)) {
+                    continue;
+                }
+
+                // Prefer local logo when available in public/brand-logos/<logo_file>.
+                $logoFile = (string) ($brand['logo_file'] ?? '');
+                if ($logoFile !== '') {
+                    $localPath = public_path("brand-logos/{$logoFile}");
+                    if (is_file($localPath)) {
+                        return asset("brand-logos/{$logoFile}");
+                    }
+                }
+
+                return 'https://logo.clearbit.com/'.rawurlencode($brand['domain']);
+            }
+        }
+
+        return null;
     }
 
     private function defaultPhotoDataUri(string $name): string
@@ -277,6 +410,47 @@ class SearchController extends Controller
 SVG;
 
         return 'data:image/svg+xml;charset=UTF-8,'.rawurlencode($svg);
+    }
+
+    private function applyPublicLocationExclusions(Builder $query): Builder
+    {
+        $personalTrainerTerms = [
+            'personal trainer',
+            'personaltraining',
+            'pt studio',
+            'pt-studio',
+            'pt ',
+            'coach',
+        ];
+        $nonSportBusinessTerms = [
+            'mondzorg',
+            'tandarts',
+            'dental',
+            'fysiotherapie',
+            'fysio',
+            'huisarts',
+            'apotheek',
+        ];
+
+        $query->whereDoesntHave('sports', function (Builder $sportQuery) {
+            $sportQuery->where('slug', 'personal-trainer');
+        });
+
+        $query->where(function (Builder $q) use ($personalTrainerTerms) {
+            foreach ($personalTrainerTerms as $term) {
+                $like = '%'.mb_strtolower($term).'%';
+                $q->whereRaw('LOWER(name) NOT LIKE ?', [$like]);
+            }
+        });
+
+        $query->where(function (Builder $q) use ($nonSportBusinessTerms) {
+            foreach ($nonSportBusinessTerms as $term) {
+                $like = '%'.mb_strtolower($term).'%';
+                $q->whereRaw('LOWER(name) NOT LIKE ?', [$like]);
+            }
+        });
+
+        return $query;
     }
 
     private function mapZoomForRadius(int $radius): int
@@ -346,5 +520,84 @@ SVG;
             ])
             ->values()
             ->all();
+    }
+
+    private function resolveOpeningHoursForDisplay(Location $location): array
+    {
+        $raw = $location->opening_hours_json;
+        if (is_string($raw) && trim($raw) !== '') {
+            $decoded = json_decode($raw, true);
+            $raw = is_array($decoded) ? $decoded : null;
+        }
+
+        if (!is_array($raw) || $raw === []) {
+            return ['today' => null, 'week' => []];
+        }
+
+        $week = array_values(array_filter(array_map(
+            fn ($line) => is_string($line) ? trim($line) : '',
+            $raw
+        )));
+
+        if ($week === []) {
+            return ['today' => null, 'week' => []];
+        }
+
+        $todayIndex = (int) now()->locale('nl')->dayOfWeekIso - 1; // 0 = maandag
+        $todayLine = $week[$todayIndex] ?? null;
+
+        return [
+            'today' => is_string($todayLine) && $todayLine !== '' ? $todayLine : null,
+            'week' => $week,
+        ];
+    }
+
+    private function shouldApplyFitnessOfficialWhitelist(Collection $selectedSports, Collection $sports): bool
+    {
+        if ($selectedSports->count() !== 1) {
+            return false;
+        }
+
+        $fitnessSport = $sports->firstWhere('slug', 'fitness');
+        if ($fitnessSport === null) {
+            return false;
+        }
+
+        return $selectedSports->contains((int) $fitnessSport->id);
+    }
+
+    private function applyFitnessOfficialWhitelist(Builder $query): void
+    {
+        $terms = [
+            'basic fit',
+            'basic-fit',
+            'basicfit',
+            'trainmore',
+            'fit for free',
+            'fit-for-free',
+            'fitforfree',
+            'sportcity',
+            'mylife',
+            'my life',
+            'anytime fitness',
+            'anytimefitness',
+            'big gym',
+            'biggym',
+            'invictus',
+            'club pellikaan',
+            'clubpellikaan',
+            'snap fitness',
+            'snapfitness',
+            'david lloyd',
+            'davidlloyd',
+            'sportplaza',
+        ];
+
+        $query->where(function (Builder $nameQuery) use ($terms) {
+            foreach ($terms as $term) {
+                $like = '%'.mb_strtolower($term).'%';
+                $nameQuery->orWhereRaw('LOWER(name) LIKE ?', [$like]);
+            }
+        });
     }
 }

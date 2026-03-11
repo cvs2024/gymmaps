@@ -98,7 +98,35 @@ class ClassifyLocationSports extends Command
     {
         $map = [
             'personal-trainer' => ['personal trainer', 'personaltraining', 'pt studio', 'pt-studio', 'coach'],
-            'fitness' => ['fitness', 'sportschool', 'gym', 'krachttraining', 'kracht train'],
+            'fitness' => [
+                'fitness',
+                'sportschool',
+                'gym',
+                'krachttraining',
+                'kracht train',
+                'basic fit',
+                'basic-fit',
+                'basicfit',
+                'trainmore',
+                'fit for free',
+                'fitforfree',
+                'fit-for-free',
+                'sportcity',
+                'mylife',
+                'my life',
+                'anytime fitness',
+                'anytimefitness',
+                'biggym',
+                'big gym',
+                'invictus',
+                'club pellikaan',
+                'clubpellikaan',
+                'snap fitness',
+                'snapfitness',
+                'david lloyd',
+                'davidlloyd',
+                'sportplaza',
+            ],
             'yoga' => ['yoga', 'pilates'],
             'boksen' => ['boksen', 'boks', 'kickbok', 'boxing', 'vechtsport'],
             'crossfit' => ['crossfit'],
@@ -117,6 +145,6 @@ class ClassifyLocationSports extends Command
             }
         }
 
-        return $found !== [] ? array_values(array_unique($found)) : ['fitness'];
+        return $found !== [] ? array_values(array_unique($found)) : [];
     }
 }

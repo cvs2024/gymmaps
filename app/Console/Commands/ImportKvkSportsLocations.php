@@ -392,7 +392,7 @@ class ImportKvkSportsLocations extends Command
             ])
         );
 
-        $photoUrl = $photoService->findPhotoUrl(
+        $placeProfile = $photoService->findPlaceProfile(
             $name,
             $address,
             $postcode,
@@ -400,6 +400,9 @@ class ImportKvkSportsLocations extends Command
             $latitude,
             $longitude
         );
+        $photoUrl = is_array($placeProfile) ? ($placeProfile['photo_url'] ?? null) : null;
+        $googlePlaceId = is_array($placeProfile) ? ($placeProfile['place_id'] ?? null) : null;
+        $openingHoursWeekdayText = is_array($placeProfile) ? ($placeProfile['opening_hours_weekday_text'] ?? null) : null;
 
         return [
             'name' => $name,
@@ -411,6 +414,10 @@ class ImportKvkSportsLocations extends Command
             'website' => $website,
             'phone' => $phone,
             'photo_url' => $photoUrl,
+            'google_place_id' => is_string($googlePlaceId) ? $googlePlaceId : null,
+            'opening_hours_json' => is_array($openingHoursWeekdayText) && $openingHoursWeekdayText !== []
+                ? json_encode($openingHoursWeekdayText, JSON_UNESCAPED_UNICODE)
+                : null,
             'source' => 'kvk',
             'external_id' => $externalId,
             'sport_slugs' => $this->mapSports($textForClassification),
@@ -421,7 +428,35 @@ class ImportKvkSportsLocations extends Command
     {
         $map = [
             'personal-trainer' => ['personal trainer', 'personaltraining', 'pt studio', 'pt-studio', 'coach'],
-            'fitness' => ['fitness', 'sportschool', 'gym', 'krachttraining', 'kracht train'],
+            'fitness' => [
+                'fitness',
+                'sportschool',
+                'gym',
+                'krachttraining',
+                'kracht train',
+                'basic fit',
+                'basic-fit',
+                'basicfit',
+                'trainmore',
+                'fit for free',
+                'fitforfree',
+                'fit-for-free',
+                'sportcity',
+                'mylife',
+                'my life',
+                'anytime fitness',
+                'anytimefitness',
+                'biggym',
+                'big gym',
+                'invictus',
+                'club pellikaan',
+                'clubpellikaan',
+                'snap fitness',
+                'snapfitness',
+                'david lloyd',
+                'davidlloyd',
+                'sportplaza',
+            ],
             'yoga' => ['yoga', 'pilates'],
             'boksen' => ['boksen', 'boks', 'kickbok', 'boxing', 'vechtsport'],
             'crossfit' => ['crossfit'],
@@ -440,7 +475,7 @@ class ImportKvkSportsLocations extends Command
             }
         }
 
-        return $found !== [] ? array_values(array_unique($found)) : ['fitness'];
+        return $found !== [] ? array_values(array_unique($found)) : [];
     }
 
     private function extractSbiText(array $detail): string

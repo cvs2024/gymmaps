@@ -314,9 +314,50 @@
 
         .location-card {
             display: grid;
-            grid-template-columns: 190px 1fr;
+            grid-template-columns: 190px minmax(0, 1fr) 260px;
             gap: 14px;
             align-items: start;
+        }
+
+        .opening-card {
+            border: 1px solid #d7e4f0;
+            border-radius: 10px;
+            background: #f8fbff;
+            padding: 10px 12px;
+        }
+
+        .opening-title {
+            margin: 0 0 8px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #123d60;
+        }
+
+        .opening-today {
+            margin: 0 0 8px;
+            font-size: 0.9rem;
+            color: #204d70;
+        }
+
+        .opening-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 4px;
+        }
+
+        .opening-list li {
+            font-size: 0.83rem;
+            color: #4e647a;
+            line-height: 1.35;
+            border-top: 1px solid #e7eef6;
+            padding-top: 4px;
+        }
+
+        .opening-list li:first-child {
+            border-top: 0;
+            padding-top: 0;
         }
 
         .location-photo {
@@ -537,6 +578,22 @@
                             <a class="btn btn-primary" href="{{ route('locations.show', $location) }}">Bekijk sportschool</a>
                         </p>
                     </div>
+                    <aside class="opening-card">
+                        <p class="opening-title">Openingstijden</p>
+                        @if(!empty($location->opening_hours_today))
+                            <p class="opening-today"><strong>Vandaag:</strong> {{ $location->opening_hours_today }}</p>
+                        @else
+                            <p class="opening-today">Nog niet beschikbaar</p>
+                        @endif
+
+                        @if(!empty($location->opening_hours_week))
+                            <ul class="opening-list">
+                                @foreach($location->opening_hours_week as $openingLine)
+                                    <li>{{ $openingLine }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </aside>
                 </div>
             </article>
         @endforeach

@@ -28,6 +28,15 @@ class LocationUpsertService
             'last_seen_at' => now(),
         ];
 
+        if (array_key_exists('google_place_id', $data)) {
+            $payload['google_place_id'] = $data['google_place_id'];
+        }
+
+        if (array_key_exists('opening_hours_json', $data)) {
+            $payload['opening_hours_json'] = $data['opening_hours_json'];
+            $payload['opening_hours_updated_at'] = now();
+        }
+
         if ($existing) {
             $existing->update($payload);
             $location = $existing;
