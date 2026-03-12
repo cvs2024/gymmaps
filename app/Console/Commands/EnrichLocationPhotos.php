@@ -27,12 +27,7 @@ class EnrichLocationPhotos extends Command
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->when($source !== '', fn ($q) => $q->where('source', $source))
-            ->when(!$force, fn ($q) => $q->where(function ($sub) {
-                $sub->whereNull('photo_url')
-                    ->orWhere('photo_url', '')
-                    ->orWhereNull('opening_hours_json')
-                    ->orWhere('opening_hours_json', '');
-            }))
+            ->when(!$force, fn ($q) => $q->whereNull('opening_hours_updated_at'))
             ->orderBy('id')
             ->limit($limit);
 
@@ -44,8 +39,13 @@ class EnrichLocationPhotos extends Command
 
         $updated = 0;
         $skipped = 0;
+        $processed = 0;
 
         foreach ($locations as $location) {
+            if ($processed >= $limit) {
+                break;
+            }
+
             $profile = $photoService->findPlaceProfile(
                 (string) $location->name,
                 (string) $location->address,
@@ -54,8 +54,13 @@ class EnrichLocationPhotos extends Command
                 (float) $location->latitude,
                 (float) $location->longitude
             );
+            $processed++;
 
             if (!is_array($profile)) {
+                if (!$force && $location->opening_hours_updated_at === null) {
+                    // Markeer als "geprobeerd" zodat volgende runs kunnen doorpakken naar latere records.
+                    $location->update(['opening_hours_updated_at' => now()]);
+                }
                 $skipped++;
                 continue;
             }
@@ -69,6 +74,8 @@ class EnrichLocationPhotos extends Command
             }
             if (is_array($profile['opening_hours_weekday_text'] ?? null) && $profile['opening_hours_weekday_text'] !== []) {
                 $payload['opening_hours_json'] = json_encode($profile['opening_hours_weekday_text'], JSON_UNESCAPED_UNICODE);
+                $payload['opening_hours_updated_at'] = now();
+            } elseif (!$force && $location->opening_hours_updated_at === null) {
                 $payload['opening_hours_updated_at'] = now();
             }
 
@@ -86,8 +93,9 @@ class EnrichLocationPhotos extends Command
         }
 
         $this->newLine();
-        $this->info("Locaties geupdate met foto: {$updated}");
-        $this->info("Locaties zonder foto resultaat: {$skipped}");
+        $this->info("Locaties verwerkt: {$processed}");
+        $this->info("Locaties geupdate met Google-data: {$updated}");
+        $this->info("Locaties zonder bruikbaar Google-resultaat: {$skipped}");
 
         return self::SUCCESS;
     }

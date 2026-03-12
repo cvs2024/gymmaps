@@ -19,33 +19,16 @@ class GooglePlacesPhotoService
             return null;
         }
 
-        $query = trim($name.', '.$address.', '.$postcode.' '.$city.', Nederland');
-        $params = [
-            'input' => $query,
-            'inputtype' => 'textquery',
-            'fields' => 'name,photos,place_id',
-            'key' => $apiKey,
-        ];
+        $queryVariants = $this->buildQueryVariants($name, $address, $postcode, $city);
+        $candidate = null;
 
-        if ($latitude !== null && $longitude !== null) {
-            $params['locationbias'] = 'point:'.$latitude.','.$longitude;
+        foreach ($queryVariants as $queryVariant) {
+            $candidate = $this->findBestCandidate($queryVariant, $apiKey, $latitude, $longitude);
+            if (is_array($candidate)) {
+                break;
+            }
         }
 
-        $response = Http::timeout(10)
-            ->retry(1, 300)
-            ->acceptJson()
-            ->get('https://maps.googleapis.com/maps/api/place/findplacefromtext/json', $params);
-
-        if ($response->failed()) {
-            return null;
-        }
-
-        $payload = $response->json();
-        if (($payload['status'] ?? null) !== 'OK') {
-            return null;
-        }
-
-        $candidate = $payload['candidates'][0] ?? null;
         if (!is_array($candidate)) {
             return null;
         }
@@ -124,5 +107,99 @@ class GooglePlacesPhotoService
             fn ($line) => is_string($line) ? trim($line) : '',
             $weekdayText
         )));
+    }
+
+    private function findBestCandidate(string $query, string $apiKey, ?float $latitude, ?float $longitude): ?array
+    {
+        $params = [
+            'input' => $query,
+            'inputtype' => 'textquery',
+            'fields' => 'name,photos,place_id,geometry',
+            'language' => 'nl',
+            'key' => $apiKey,
+        ];
+
+        if ($latitude !== null && $longitude !== null) {
+            $params['locationbias'] = 'point:'.$latitude.','.$longitude;
+        }
+
+        $response = Http::timeout(10)
+            ->retry(2, 350)
+            ->acceptJson()
+            ->get('https://maps.googleapis.com/maps/api/place/findplacefromtext/json', $params);
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        $payload = $response->json();
+        if (($payload['status'] ?? null) !== 'OK') {
+            return null;
+        }
+
+        $candidates = $payload['candidates'] ?? [];
+        if (!is_array($candidates) || $candidates === []) {
+            return null;
+        }
+
+        if ($latitude === null || $longitude === null) {
+            return is_array($candidates[0] ?? null) ? $candidates[0] : null;
+        }
+
+        $bestCandidate = null;
+        $bestDistance = INF;
+
+        foreach ($candidates as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+
+            $candidateLat = $candidate['geometry']['location']['lat'] ?? null;
+            $candidateLng = $candidate['geometry']['location']['lng'] ?? null;
+            if (!is_numeric($candidateLat) || !is_numeric($candidateLng)) {
+                continue;
+            }
+
+            $distance = $this->haversineDistanceKm(
+                $latitude,
+                $longitude,
+                (float) $candidateLat,
+                (float) $candidateLng
+            );
+
+            if ($distance < $bestDistance) {
+                $bestDistance = $distance;
+                $bestCandidate = $candidate;
+            }
+        }
+
+        return is_array($bestCandidate) ? $bestCandidate : (is_array($candidates[0] ?? null) ? $candidates[0] : null);
+    }
+
+    private function buildQueryVariants(string $name, string $address, string $postcode, string $city): array
+    {
+        $variants = [
+            trim($name.', '.$address.', '.$postcode.' '.$city.', Nederland'),
+            trim($name.', '.$postcode.' '.$city.', Nederland'),
+            trim($name.', '.$city.', Nederland'),
+            trim($name.', Nederland'),
+        ];
+
+        return array_values(array_unique(array_filter($variants, fn ($query) => $query !== '')));
+    }
+
+    private function haversineDistanceKm(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earthRadiusKm = 6371;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2)
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2))
+            * sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadiusKm * $c;
     }
 }
