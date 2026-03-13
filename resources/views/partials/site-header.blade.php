@@ -162,9 +162,10 @@
     $isExternalLogo = str_starts_with($headerLogoPath, 'http://') || str_starts_with($headerLogoPath, 'https://');
     $normalizedPath = ltrim($headerLogoPath, '/');
     $localLogoExists = !$isExternalLogo && is_file(public_path($normalizedPath));
+    $effectiveLogoPath = $localLogoExists ? $normalizedPath : 'logo/gymmaps_logo_treatwell_style.png';
     $headerLogoSrc = $isExternalLogo
         ? $headerLogoPath
-        : ($localLogoExists ? asset($normalizedPath) : asset('logo/gymmaps_logo_treatwell_style.png'));
+        : asset($effectiveLogoPath).'?v='.(is_file(public_path($effectiveLogoPath)) ? filemtime(public_path($effectiveLogoPath)) : time());
 @endphp
 
 <nav class="gm-site-nav" id="gmSiteNav">
