@@ -1,9 +1,9 @@
 <style>
     .gm-site-footer {
         margin-top: 28px;
-        background: #0f3f73;
-        color: #dce8f3;
-        border-top: 1px solid #1e5a92;
+        background: #FF5C39;
+        color: #ffffff;
+        border-top: 1px solid #E24C2B;
     }
 
     .gm-site-footer-inner {
@@ -21,7 +21,7 @@
     .gm-site-footer a {
         color: #ffffff;
         text-decoration: none;
-        opacity: 0.95;
+        opacity: 0.98;
     }
 
     .gm-site-footer a:hover {

@@ -339,6 +339,10 @@
             color: #204d70;
         }
 
+        .opening-today strong {
+            color: #FF5C39;
+        }
+
         .opening-list {
             margin: 0;
             padding: 0;
@@ -434,6 +438,16 @@
             background: #f4f7fb;
         }
 
+        @media (max-width: 980px) {
+            .location-card {
+                grid-template-columns: 160px minmax(0, 1fr);
+            }
+
+            .opening-card {
+                grid-column: 1 / -1;
+            }
+        }
+
         @media (max-width: 760px) {
             .top-layout {
                 grid-template-columns: 1fr;
@@ -442,6 +456,11 @@
             .field-search, .field-radius, .field-options { flex: 1 1 auto; }
             h1 { font-size: 1.6rem; }
             .location-card { grid-template-columns: 1fr; }
+            .promo-bar-inner {
+                padding: 14px 12px;
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
         }
     </style>
 </head>
