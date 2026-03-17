@@ -17,6 +17,8 @@ Route::view('/login', 'pages.login')->name('login');
 Route::get('/personal-trainer-zoeken', [PersonalTrainerRequestController::class, 'index'])->name('pages.personal-trainer');
 Route::post('/personal-trainer-zoeken', [PersonalTrainerRequestController::class, 'store'])->name('pages.personal-trainer.store');
 Route::view('/blog', 'pages.blog')->name('pages.blog');
+Route::view('/tarieven', 'pages.pricing')->name('pages.pricing');
+Route::view('/over-ons', 'pages.about')->name('pages.about');
 Route::view('/blog/de-beste-sportscholen-in-nederland', 'pages.blogs.best-sportscholen')->name('pages.blog.best-sportscholen');
 Route::view('/blog/sportschool-in-de-buurt-vinden', 'pages.blogs.sportschool-in-de-buurt')->name('pages.blog.sportschool-in-de-buurt');
 Route::view('/blog/waarom-sporten-met-een-gymbuddy-effectief-is', 'pages.blogs.gymbuddy-effectief')->name('pages.blog.gymbuddy-effectief');

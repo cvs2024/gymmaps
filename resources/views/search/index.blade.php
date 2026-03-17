@@ -604,14 +604,6 @@
                         @else
                             <p class="opening-today">Nog niet beschikbaar</p>
                         @endif
-
-                        @if(!empty($location->opening_hours_week))
-                            <ul class="opening-list">
-                                @foreach($location->opening_hours_week as $openingLine)
-                                    <li>{{ $openingLine }}</li>
-                                @endforeach
-                            </ul>
-                        @endif
                     </aside>
                 </div>
             </article>

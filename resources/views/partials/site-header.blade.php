@@ -11,11 +11,11 @@
     .gm-site-nav-inner {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 8px 18px;
+        padding: 5px 18px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
-        gap: 12px;
+        gap: 22px;
     }
 
     .gm-nav-top {
@@ -23,16 +23,16 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        width: 100%;
+        width: auto;
     }
 
     .gm-nav-logo {
         display: inline-flex;
         align-items: center;
         text-decoration: none;
-        width: clamp(320px, 34vw, 520px);
-        min-width: 320px;
-        height: 72px;
+        width: clamp(250px, 26vw, 360px);
+        min-width: 250px;
+        height: 56px;
         overflow: visible;
     }
 
@@ -40,7 +40,7 @@
         width: auto;
         max-width: 100%;
         height: auto;
-        max-height: 72px;
+        max-height: 56px;
         object-fit: contain;
         object-position: left center;
         display: block;
@@ -49,14 +49,24 @@
 
     .gm-nav-menu {
         display: flex;
-        justify-content: flex-start;
-        gap: 18px;
-        flex-wrap: wrap;
+        justify-content: space-evenly;
+        gap: 10px;
+        flex-wrap: nowrap;
+        align-items: center;
+        flex: 1 1 auto;
+        min-width: 0;
         font-family: "Poppins", "Segoe UI", sans-serif;
         font-weight: 400;
-        font-size: 0.92rem;
+        font-size: 0.86rem;
         letter-spacing: 0.015em;
         text-transform: uppercase;
+    }
+
+    .gm-nav-item {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
     }
 
     .gm-nav-toggle {
@@ -72,21 +82,27 @@
         cursor: pointer;
     }
 
-    .gm-nav-menu a {
+    .gm-nav-link,
+    .gm-nav-item > a {
         color: #29466a;
         text-decoration: none;
         line-height: 1.2;
-        padding: 0;
+        padding: 4px 0;
         background: transparent;
         border: 0;
         position: relative;
+        font: inherit;
+        text-transform: inherit;
+        cursor: pointer;
     }
 
-    .gm-nav-menu a:hover {
+    .gm-nav-link:hover,
+    .gm-nav-item > a:hover {
         color: #0f5e88;
     }
 
-    .gm-nav-menu a::after {
+    .gm-nav-link::after,
+    .gm-nav-item > a::after {
         content: "";
         position: absolute;
         left: 0;
@@ -97,7 +113,67 @@
         transition: width 0.18s ease;
     }
 
-    .gm-nav-menu a:hover::after { width: 100%; }
+    .gm-nav-link:hover::after,
+    .gm-nav-item > a:hover::after { width: 100%; }
+
+    .gm-nav-dropdown {
+        position: relative;
+    }
+
+    .gm-nav-dropdown summary {
+        list-style: none;
+    }
+
+    .gm-nav-dropdown summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .gm-nav-dropdown summary .caret {
+        display: inline-block;
+        margin-left: 6px;
+        font-size: 0.68rem;
+        transform: translateY(-1px);
+    }
+
+    .gm-nav-dropdown-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        min-width: 220px;
+        background: #fff;
+        border: 1px solid #d8e4ef;
+        border-radius: 10px;
+        box-shadow: 0 10px 24px rgba(12, 44, 72, 0.12);
+        padding: 8px;
+        display: none;
+        z-index: 40;
+    }
+
+    .gm-nav-dropdown[open] .gm-nav-dropdown-panel {
+        display: block;
+    }
+
+    .gm-nav-dropdown-panel a {
+        display: block;
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 0.9rem;
+        padding: 8px 10px;
+        border-radius: 8px;
+        color: #29466a;
+        text-decoration: none;
+    }
+
+    .gm-nav-dropdown-panel a:hover {
+        background: #eef5fb;
+        color: #0f5e88;
+    }
+
+    @media (min-width: 901px) {
+        .gm-nav-dropdown:hover .gm-nav-dropdown-panel {
+            display: block;
+        }
+    }
 
     .btn,
     .btn-primary,
@@ -119,13 +195,15 @@
         color: #fff !important;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 900px) {
         .gm-site-nav-inner {
             flex-direction: column;
             align-items: stretch;
             gap: 8px;
             padding: 8px 14px;
         }
+
+        .gm-nav-top { width: 100%; }
 
         .gm-nav-toggle { display: inline-flex; }
 
@@ -142,6 +220,7 @@
             width: 100%;
             flex-direction: column;
             gap: 0;
+            flex-wrap: nowrap;
             border-top: 1px solid #e1ebf4;
             padding-top: 6px;
             font-size: 0.86rem;
@@ -151,8 +230,22 @@
             display: flex;
         }
 
-        .gm-nav-menu a {
+        .gm-nav-link,
+        .gm-nav-item > a {
             padding: 10px 2px;
+        }
+
+        .gm-nav-item {
+            width: 100%;
+            display: block;
+        }
+
+        .gm-nav-dropdown-panel {
+            position: static;
+            min-width: 0;
+            margin-top: 6px;
+            border-radius: 10px;
+            box-shadow: none;
         }
     }
 </style>
@@ -180,13 +273,43 @@
         </div>
 
         <div class="gm-nav-menu" id="gmNavMenu">
-            <a href="{{ route('listing-requests.create') }}">Sportschool aanmelden</a>
-            <a href="{{ route('gymbuddy.index') }}">Gymbuddy gezocht</a>
-            <a href="{{ route('pages.personal-trainer') }}">Personal trainer</a>
-            <a href="{{ route('pages.blog') }}">Blog</a>
-            <a href="{{ route('pages.faq') }}">FAQ</a>
-            <a href="{{ route('pages.contact') }}">Contact</a>
-            <a href="{{ route('login') }}">Inloggen</a>
+            <div class="gm-nav-item">
+                <details class="gm-nav-dropdown">
+                    <summary class="gm-nav-link">Gyms <span class="caret">▾</span></summary>
+                    <div class="gm-nav-dropdown-panel">
+                        <a href="{{ route('listing-requests.create') }}">Sportschool aanmelden</a>
+                        <a href="{{ route('pages.pricing') }}">Tarieven</a>
+                    </div>
+                </details>
+            </div>
+
+            <div class="gm-nav-item">
+                <a href="{{ route('gymbuddy.index') }}">Gymbuddy</a>
+            </div>
+
+            <div class="gm-nav-item">
+                <details class="gm-nav-dropdown">
+                    <summary class="gm-nav-link">Personal Trainer <span class="caret">▾</span></summary>
+                    <div class="gm-nav-dropdown-panel">
+                        <a href="{{ route('pages.personal-trainer') }}#actieve-oproepen">Alle verzoeken</a>
+                        <a href="{{ route('pages.pricing') }}">Tarieven</a>
+                    </div>
+                </details>
+            </div>
+
+            <div class="gm-nav-item">
+                <a href="{{ route('pages.blog') }}">Blog</a>
+            </div>
+
+            <div class="gm-nav-item">
+                <details class="gm-nav-dropdown">
+                    <summary class="gm-nav-link">Contact <span class="caret">▾</span></summary>
+                    <div class="gm-nav-dropdown-panel">
+                        <a href="{{ route('pages.faq') }}">Veelgestelde vragen</a>
+                        <a href="{{ route('pages.about') }}">Over ons</a>
+                    </div>
+                </details>
+            </div>
         </div>
     </div>
 </nav>

@@ -20,6 +20,13 @@
         .btn-primary { background:#0f8a5f; color:#fff; }
         .btn-ghost { background:#e8eff7; color:#173f60; }
         .toolbar { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+        .opening-card { margin-top: 12px; border: 1px solid #d7e4f0; border-radius: 10px; background: #f8fbff; padding: 10px 12px; }
+        .opening-title { margin: 0 0 8px; font-size: 0.92rem; font-weight: 700; color: #123d60; }
+        .opening-today { margin: 0 0 8px; font-size: 0.9rem; color: #204d70; }
+        .opening-today strong { color: #FF5C39; }
+        .opening-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+        .opening-list li { font-size: 0.83rem; color: #4e647a; line-height: 1.35; border-top: 1px solid #e7eef6; padding-top: 4px; }
+        .opening-list li:first-child { border-top: 0; padding-top: 0; }
         #map { width:100%; min-height:280px; border-radius:12px; }
         @media (max-width: 860px) { .hero { grid-template-columns:1fr; } .photo { height:220px; } }
     </style>
@@ -57,6 +64,23 @@
                 @endif
                 <a class="btn btn-ghost" href="{{ route('home') }}">Terug naar overzicht</a>
             </div>
+
+            <aside class="opening-card">
+                <p class="opening-title">Openingstijden</p>
+                @if(!empty($openingHoursToday))
+                    <p class="opening-today"><strong>Vandaag:</strong> {{ $openingHoursToday }}</p>
+                @else
+                    <p class="opening-today">Vandaag: niet beschikbaar</p>
+                @endif
+
+                @if(!empty($openingHoursWeek))
+                    <ul class="opening-list">
+                        @foreach($openingHoursWeek as $openingLine)
+                            <li>{{ $openingLine }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+            </aside>
         </div>
     </article>
 

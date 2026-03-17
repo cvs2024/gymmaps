@@ -12,12 +12,15 @@ class LocationProfileController extends Controller
 
         $googleMapsKey = (string) config('services.google_maps.key');
         $photoUrl = $this->resolvePhotoUrl($location, $googleMapsKey);
+        $openingHours = $this->resolveOpeningHoursForDisplay($location);
 
         return view('locations.show', [
             'location' => $location,
             'photoUrl' => $photoUrl,
             'websiteUrl' => $this->resolveWebsiteUrl($location),
             'googleSearchUrl' => $this->resolveGoogleSearchUrl($location),
+            'openingHoursToday' => $openingHours['today'],
+            'openingHoursWeek' => $openingHours['week'],
             'googleMapsKey' => $googleMapsKey,
         ]);
     }
@@ -99,5 +102,35 @@ class LocationProfileController extends Controller
         ])));
 
         return 'https://www.google.com/search?q=' . rawurlencode($query);
+    }
+
+    private function resolveOpeningHoursForDisplay(Location $location): array
+    {
+        $raw = $location->opening_hours_json;
+        if (is_string($raw) && trim($raw) !== '') {
+            $decoded = json_decode($raw, true);
+            $raw = is_array($decoded) ? $decoded : null;
+        }
+
+        if (!is_array($raw) || $raw === []) {
+            return ['today' => null, 'week' => []];
+        }
+
+        $week = array_values(array_filter(array_map(
+            fn ($line) => is_string($line) ? trim($line) : '',
+            $raw
+        )));
+
+        if ($week === []) {
+            return ['today' => null, 'week' => []];
+        }
+
+        $todayIndex = (int) now()->locale('nl')->dayOfWeekIso - 1; // 0 = maandag
+        $todayLine = $week[$todayIndex] ?? null;
+
+        return [
+            'today' => is_string($todayLine) && $todayLine !== '' ? $todayLine : null,
+            'week' => $week,
+        ];
     }
 }
