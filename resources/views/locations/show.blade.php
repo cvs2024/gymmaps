@@ -12,6 +12,18 @@
         .card { background:#fff; border:1px solid #d5e1ec; border-radius:14px; padding:18px; margin-bottom:14px; }
         .hero { display:grid; grid-template-columns:1.2fr 1fr; gap:14px; }
         .photo { width:100%; height:300px; object-fit:cover; border-radius:12px; border:1px solid #d5e1ec; background:#edf2f7; }
+        .photo-placeholder {
+            width:100%;
+            height:300px;
+            border-radius:12px;
+            border:1px solid #d5e1ec;
+            background:#edf2f7;
+            color:#5f7182;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:600;
+        }
         .name { margin:0 0 8px; font-size:1.9rem; }
         .muted { color:#5f7182; margin:4px 0; }
         .tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
@@ -35,7 +47,12 @@
 @include('partials.site-header')
 <div class="container">
     <article class="card hero">
-        <img class="photo" src="{{ $photoUrl }}" alt="Foto van {{ $location->name }}">
+        @if($photoUrl)
+            <img class="photo" src="{{ $photoUrl }}" alt="Foto van {{ $location->name }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="photo-placeholder" style="display:none;">Geen foto beschikbaar</div>
+        @else
+            <div class="photo-placeholder">Geen foto beschikbaar</div>
+        @endif
         <div>
             <h1 class="name">{{ $location->name }}</h1>
             <p class="muted">{{ $location->address }}</p>

@@ -565,18 +565,23 @@
         @foreach(($paginatedResults?->items() ?? []) as $location)
             <article class="card">
                 <div class="location-card">
-                    <img
-                        class="location-photo {{ $location->display_logo_url ? 'logo' : '' }}"
-                        src="{{ $location->display_logo_url ?: $location->display_photo_url }}"
-                        alt="Foto van {{ $location->name }}"
-                        @if($location->display_logo_url)
-                            data-fallback="{{ $location->display_photo_url }}"
-                            data-final-fallback="{{ $location->fallback_photo_url }}"
-                            onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.classList.remove('logo');this.dataset.fallback='';return;}if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';return;}this.onerror=null;"
-                        @else
-                            onerror="this.onerror=null;this.src='{{ $location->fallback_photo_url }}';this.classList.remove('logo');"
+                    <div>
+                        <img
+                            class="location-photo {{ $location->display_logo_url ? 'logo' : '' }}"
+                            src="{{ $location->display_logo_url ?: ($location->display_photo_url ?: $location->fallback_photo_url) }}"
+                            alt="Foto van {{ $location->name }}"
+                            @if($location->display_logo_url)
+                                data-fallback="{{ $location->display_photo_url }}"
+                                data-final-fallback="{{ $location->fallback_photo_url }}"
+                                onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.classList.remove('logo');this.dataset.fallback='';return;}if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';return;}this.onerror=null;"
+                            @else
+                                onerror="this.onerror=null;this.src='{{ $location->fallback_photo_url }}';this.classList.remove('logo');"
+                            @endif
+                        >
+                        @if(!$location->display_logo_url && !$location->display_photo_url)
+                            <p class="muted" style="margin-top:6px;">Geen foto beschikbaar</p>
                         @endif
-                    >
+                    </div>
                     <div>
                         <p class="location-name">{{ $location->name }}</p>
                         <p class="muted">{{ $location->address }}, {{ $location->postcode }} {{ $location->city }}</p>

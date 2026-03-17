@@ -251,21 +251,12 @@ class SearchController extends Controller
         ]);
     }
 
-    private function resolvePhotoUrl(Location $location, string $googleMapsKey): string
+    private function resolvePhotoUrl(Location $location, string $googleMapsKey): ?string
     {
         if (is_string($location->photo_url) && trim($location->photo_url) !== '') {
             return $location->photo_url;
         }
-
-        if ($googleMapsKey !== '') {
-            $lat = (float) $location->latitude;
-            $lng = (float) $location->longitude;
-            $locationParam = rawurlencode($lat.','.$lng);
-
-            return "https://maps.googleapis.com/maps/api/streetview?size=640x360&location={$locationParam}&fov=90&pitch=0&key={$googleMapsKey}";
-        }
-
-        return $this->defaultPhotoDataUri($location->name);
+        return null;
     }
 
     private function resolveLogoUrl(Location $location): ?string

@@ -6,7 +6,13 @@
         --gm-brand-accent-dark: #E24C2B;
     }
 
-    .gm-site-nav { width: 100%; background: #ffffff; border-bottom: 1px solid #d9e4ee; }
+    .gm-site-nav {
+        width: 100%;
+        background: #ffffff;
+        border-bottom: 1px solid #d9e4ee;
+        position: relative;
+        z-index: 5000;
+    }
 
     .gm-site-nav-inner {
         max-width: 1400px;
@@ -146,7 +152,7 @@
         box-shadow: 0 10px 24px rgba(12, 44, 72, 0.12);
         padding: 8px;
         display: none;
-        z-index: 40;
+        z-index: 5100;
     }
 
     .gm-nav-dropdown[open] .gm-nav-dropdown-panel {

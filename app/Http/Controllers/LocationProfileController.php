@@ -25,21 +25,12 @@ class LocationProfileController extends Controller
         ]);
     }
 
-    private function resolvePhotoUrl(Location $location, string $googleMapsKey): string
+    private function resolvePhotoUrl(Location $location, string $googleMapsKey): ?string
     {
         if (is_string($location->photo_url) && trim($location->photo_url) !== '') {
             return $location->photo_url;
         }
-
-        if ($googleMapsKey !== '') {
-            $lat = (float) $location->latitude;
-            $lng = (float) $location->longitude;
-            $locationParam = rawurlencode($lat.','.$lng);
-
-            return "https://maps.googleapis.com/maps/api/streetview?size=960x540&location={$locationParam}&fov=90&pitch=0&key={$googleMapsKey}";
-        }
-
-        return 'https://placehold.co/960x540/eaf1f7/587089?text=Geen+foto';
+        return null;
     }
 
     private function resolveWebsiteUrl(Location $location): ?string
