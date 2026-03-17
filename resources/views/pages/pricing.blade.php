@@ -7,6 +7,7 @@
     <title>Tarieven - GymMaps.nl</title>
     <meta name="description" content="Premium vermelding op GymMaps: meer zichtbaarheid voor jouw sportschool voor €20 per maand.">
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
         :root {
             --bg: #eef4fb;
@@ -23,11 +24,8 @@
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
-            background:
-                radial-gradient(1000px 520px at 5% -15%, rgba(20, 90, 150, 0.12), transparent 60%),
-                radial-gradient(1000px 500px at 98% -10%, rgba(20, 90, 150, 0.11), transparent 58%),
-                var(--bg);
-            color: var(--ink);
+            background: transparent;
+            color: var(--gm-brand-text);
         }
 
         .container { max-width: 1120px; margin: 0 auto; padding: 18px 16px 46px; }
@@ -356,4 +354,3 @@
 @include('partials.site-footer')
 </body>
 </html>
-

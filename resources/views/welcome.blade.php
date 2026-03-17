@@ -6,6 +6,7 @@
     @include('partials.google-site-verification')
     <title>{{ config('app.name', 'Gymmaps') }}</title>
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
         :root {
             --bg: #f4f8fc;

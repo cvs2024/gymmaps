@@ -1,9 +1,17 @@
 @php
-    $configuredFaviconPath = config('branding.favicon_path', 'favicon.png');
+    $defaultFaviconCandidates = [
+        'Favicom GM.png',
+        'ICOON.png',
+        'favicon.png',
+    ];
+    $defaultFaviconPath = collect($defaultFaviconCandidates)
+        ->first(fn ($path) => is_file(public_path($path))) ?? 'favicon.png';
+
+    $configuredFaviconPath = config('branding.favicon_path', $defaultFaviconPath);
     $isExternal = str_starts_with($configuredFaviconPath, 'http://') || str_starts_with($configuredFaviconPath, 'https://');
     $normalizedFaviconPath = ltrim($configuredFaviconPath, '/');
     $localConfiguredExists = !$isExternal && is_file(public_path($normalizedFaviconPath));
-    $localFallbackPath = 'favicon.png';
+    $localFallbackPath = $defaultFaviconPath;
     $localFallbackExists = is_file(public_path($localFallbackPath));
 
     if ($isExternal) {

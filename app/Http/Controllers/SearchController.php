@@ -59,6 +59,10 @@ class SearchController extends Controller
             ->filter()
             ->values();
 
+        if ($request->routeIs('home') && $query !== '') {
+            return redirect()->route('overview', $request->query());
+        }
+
         $radius = in_array($radius, [5, 10, 20, 50, 250], true) ? $radius : 10;
         $applyFitnessWhitelist = $this->shouldApplyFitnessOfficialWhitelist($selectedSports, $sports);
 
@@ -232,6 +236,8 @@ class SearchController extends Controller
             ];
         })->values()->all();
 
+        $showOverview = !$request->routeIs('home') || $query !== '';
+
         return view('search.index', [
             'sports' => $sports,
             'results' => $results,
@@ -248,6 +254,7 @@ class SearchController extends Controller
             'mapLocations' => $mapLocations,
             'totalKvkLocations' => $totalKvkLocations,
             'isUsingFallbackSource' => $isUsingFallbackSource,
+            'showOverview' => $showOverview,
         ]);
     }
 

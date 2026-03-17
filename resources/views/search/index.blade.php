@@ -7,67 +7,193 @@
     <title>Gymmap.nl - Sportlocaties in Nederland</title>
     <meta name="description" content="GymMaps.nl helpt je snel sportscholen, personal trainers en sportlocaties in Nederland te vinden op kaart, inclusief adres, afstand en sportfilter.">
     @include('partials.favicon')
+    @include('partials.brand-theme')
+    @php
+        $heroBackdropCandidates = [
+            'hero/filter-map-bg.png',
+            'hero/filter-map-bg.jpg',
+            'hero/filter-map-bg.jpeg',
+            'hero/filter-map-bg.webp',
+        ];
+        $heroBackdropPath = collect($heroBackdropCandidates)
+            ->first(fn ($path) => is_file(public_path($path)));
+        $heroBackdropUrl = $heroBackdropPath ? asset($heroBackdropPath).'?v='.filemtime(public_path($heroBackdropPath)) : null;
+
+        $heroSideImageCandidates = [
+            'hero/filter-side-art.png',
+            'hero/filter-side-art.jpg',
+            'hero/filter-side-art.jpeg',
+            'hero/filter-side-art.webp',
+            'hero/left-filter-art.png',
+            'hero/left-filter-art.jpg',
+            'hero/left-filter-art.jpeg',
+            'hero/left-filter-art.webp',
+        ];
+        $heroSideImagePath = collect($heroSideImageCandidates)
+            ->first(fn ($path) => is_file(public_path($path)));
+        $heroSideImageUrl = $heroSideImagePath ? asset($heroSideImagePath).'?v='.filemtime(public_path($heroSideImagePath)) : null;
+
+        $gymbuddyCardBgCandidates = [
+            'gymbuddy.png',
+            'hero/gymbuddy-card-bg.png',
+            'hero/gymbuddy-card-bg.jpg',
+            'hero/gymbuddy-card-bg.jpeg',
+            'hero/gymbuddy-card-bg.webp',
+        ];
+        $gymbuddyCardBgPath = collect($gymbuddyCardBgCandidates)
+            ->first(fn ($path) => is_file(public_path($path)));
+        $gymbuddyCardBgUrl = $gymbuddyCardBgPath ? asset($gymbuddyCardBgPath).'?v='.filemtime(public_path($gymbuddyCardBgPath)) : null;
+
+        $trainerCardImageCandidates = [
+            'stockfoto PT.png',
+            'stockfoto-pt.png',
+            'personal-trainer.png',
+            'trainer.png',
+        ];
+        $trainerCardImagePath = collect($trainerCardImageCandidates)
+            ->first(fn ($path) => is_file(public_path($path)));
+        $trainerCardImageUrl = $trainerCardImagePath ? asset($trainerCardImagePath).'?v='.filemtime(public_path($trainerCardImagePath)) : null;
+
+        $ownerGrowthImageCandidates = [
+            'owner-growth.png',
+            'owner-growth.jpg',
+            'sportschool-stock.png',
+            'sportschool-stock.jpg',
+            'premium-stock.png',
+            'premium-stock.jpg',
+            'hero/hero-stock.jpg',
+        ];
+        $ownerGrowthImagePath = collect($ownerGrowthImageCandidates)
+            ->first(fn ($path) => is_file(public_path($path)));
+        $ownerGrowthImageUrl = $ownerGrowthImagePath ? asset($ownerGrowthImagePath).'?v='.filemtime(public_path($ownerGrowthImagePath)) : null;
+    @endphp
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 
         :root {
             color-scheme: light;
-            --bg: #f4f7fb;
-            --card: #ffffff;
-            --text: #0b1f33;
-            --muted: #586779;
-            --accent: #0f5e88;
-            --accent-dark: #0c4f74;
-            --border: #d5e0ea;
+            --brand-teal: #0f5b57;
+            --brand-teal-dark: #0b4945;
+            --brand-peach: #fff1e8;
+            --brand-peach-soft: #fff7f2;
+            --brand-orange: #ff6a3d;
+            --brand-orange-dark: #ea5530;
+            --brand-navy: #11304a;
+            --bg: #fff8f3;
+            --card: #fffefe;
+            --text: #163b4b;
+            --muted: #5f7383;
+            --accent: var(--brand-orange);
+            --accent-dark: var(--brand-orange-dark);
+            --border: #e7ddd6;
+            --shadow-soft: 0 10px 30px rgba(18, 47, 70, 0.08);
         }
 
         * { box-sizing: border-box; }
 
-        .promo-bar {
-            width: 100%;
-            background: #dbecef;
-            border-bottom: 1px solid #cfe3e8;
-            color: #11395f;
-        }
-
-        .promo-bar-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px 16px;
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: 500;
-            letter-spacing: 0.01em;
-        }
-
-        .promo-bar a {
-            color: #0f4f7c;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .promo-bar a:hover {
-            text-decoration: underline;
-        }
-
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
-            background:
-                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
-                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
-                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
+            background: #F2C1B3;
             color: var(--text);
             min-height: 100vh;
+            position: relative;
+            isolation: isolate;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: 0.16;
+        }
+
+        body::before {
+            width: min(38vw, 460px);
+            height: min(42vw, 500px);
+            left: -80px;
+            bottom: -90px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 260'%3E%3Cg fill='%231f6b5c'%3E%3Cellipse cx='92' cy='56' rx='24' ry='46' transform='rotate(-30 92 56)'/%3E%3Cellipse cx='132' cy='86' rx='22' ry='44' transform='rotate(-12 132 86)'/%3E%3Cellipse cx='148' cy='126' rx='20' ry='40' transform='rotate(6 148 126)'/%3E%3Cellipse cx='132' cy='164' rx='20' ry='40' transform='rotate(28 132 164)'/%3E%3Crect x='95' y='48' width='10' height='156' rx='5' transform='rotate(18 100 126)'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        body::after {
+            width: min(32vw, 380px);
+            height: min(34vw, 420px);
+            right: -70px;
+            top: 38%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg fill='%23205a4f'%3E%3Cellipse cx='76' cy='82' rx='16' ry='36' transform='rotate(-28 76 82)'/%3E%3Cellipse cx='112' cy='64' rx='16' ry='34' transform='rotate(18 112 64)'/%3E%3Cellipse cx='130' cy='100' rx='14' ry='30' transform='rotate(36 130 100)'/%3E%3Crect x='96' y='58' width='8' height='104' rx='4'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .gm-site-nav {
+            background: #f7fcfa;
+            border-bottom: 1px solid #deece8;
+            backdrop-filter: blur(3px);
+        }
+
+        .gm-site-nav-inner {
+            padding: 5px 18px;
+            gap: 28px;
+        }
+
+        .gm-nav-menu {
+            gap: 18px;
+            font-size: 0.88rem;
+        }
+
+        .gm-nav-link,
+        .gm-nav-item > a {
+            color: #21465a;
+        }
+
+        .gm-nav-link:hover,
+        .gm-nav-item > a:hover {
+            color: var(--brand-teal);
+        }
+
+        .gm-nav-link::after,
+        .gm-nav-item > a::after {
+            background: var(--brand-teal);
         }
 
         .container {
             max-width: 1220px;
             margin: 0 auto;
-            padding: 14px 16px 40px;
+            padding: 12px 16px 40px;
+            position: relative;
         }
 
-        h1 { margin: 0 0 8px; font-size: 2rem; }
+        .container::before,
+        .container::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: 0.12;
+        }
+
+        .container::before {
+            width: min(28vw, 320px);
+            height: min(28vw, 320px);
+            left: -78px;
+            top: 560px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg fill='%231f6b5c'%3E%3Cellipse cx='84' cy='74' rx='16' ry='34' transform='rotate(-24 84 74)'/%3E%3Cellipse cx='118' cy='98' rx='15' ry='32' transform='rotate(-6 118 98)'/%3E%3Cellipse cx='130' cy='132' rx='14' ry='28' transform='rotate(18 130 132)'/%3E%3Crect x='94' y='70' width='7' height='96' rx='3.5'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .container::after {
+            width: min(24vw, 280px);
+            height: min(24vw, 280px);
+            right: -52px;
+            bottom: 120px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23215f53'%3E%3Cellipse cx='70' cy='76' rx='14' ry='30' transform='rotate(-28 70 76)'/%3E%3Cellipse cx='102' cy='60' rx='14' ry='30' transform='rotate(20 102 60)'/%3E%3Cellipse cx='120' cy='94' rx='12' ry='24' transform='rotate(34 120 94)'/%3E%3Crect x='88' y='54' width='7' height='86' rx='3.5'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        h1 { margin: 0 0 8px; font-size: 2.1rem; line-height: 1.16; color: var(--brand-teal-dark); }
         p { margin: 0; color: inherit; }
 
         .toolbar {
@@ -79,71 +205,238 @@
 
         .btn {
             border: 0;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-weight: 600;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-weight: 700;
             text-decoration: none;
             display: inline-block;
             cursor: pointer;
+            transition: transform 0.14s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
 
-        .btn-primary { background: var(--accent); color: #fff; }
-        .btn-primary:hover { background: var(--accent-dark); }
-        .btn-light { background: var(--accent); color: #fff; }
-        .btn-light:hover { background: var(--accent-dark); }
+        .btn-primary { background: var(--brand-orange); color: #fff; box-shadow: 0 10px 18px rgba(255, 106, 61, 0.24); }
+        .btn-primary:hover { background: var(--brand-orange-dark); transform: translateY(-1px); }
+        .btn-light { background: var(--brand-orange); color: #fff; }
+        .btn-light:hover { background: var(--brand-orange-dark); transform: translateY(-1px); }
 
         .card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 18px;
             padding: 16px;
             margin-bottom: 14px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .hero-stage {
+            position: relative;
+            background:
+                linear-gradient(180deg, rgba(255, 247, 242, 0.72) 0%, rgba(255, 247, 242, 0.62) 100%)
+                @if($heroBackdropUrl)
+                    , url('{{ $heroBackdropUrl }}')
+                @endif
+            ;
+            background-size:
+                100% 100%
+                @if($heroBackdropUrl)
+                    , 100% auto
+                @endif
+            ;
+            background-position:
+                center center
+                @if($heroBackdropUrl)
+                    , center bottom
+                @endif
+            ;
+            background-repeat: no-repeat;
+            border: 1px solid #f2dfd2;
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            box-shadow: 0 14px 36px rgba(34, 48, 62, 0.08);
+        }
+
+        .hero-stage::before,
+        .hero-stage::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: 0.18;
+        }
+
+        .hero-stage::before {
+            width: 238px;
+            height: 238px;
+            left: -56px;
+            bottom: -42px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg fill='%231f6b5c'%3E%3Cellipse cx='96' cy='52' rx='22' ry='46' transform='rotate(-30 96 52)'/%3E%3Cellipse cx='132' cy='82' rx='22' ry='46' transform='rotate(-12 132 82)'/%3E%3Cellipse cx='147' cy='124' rx='20' ry='42' transform='rotate(8 147 124)'/%3E%3Cellipse cx='128' cy='160' rx='20' ry='40' transform='rotate(26 128 160)'/%3E%3Crect x='92' y='46' width='10' height='140' rx='5' transform='rotate(18 97 116)'/%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.2;
+        }
+
+        .hero-stage::after {
+            width: 194px;
+            height: 194px;
+            right: -58px;
+            top: -44px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23215f53'%3E%3Cellipse cx='68' cy='78' rx='16' ry='36' transform='rotate(-28 68 78)'/%3E%3Cellipse cx='104' cy='62' rx='16' ry='34' transform='rotate(18 104 62)'/%3E%3Cellipse cx='126' cy='98' rx='14' ry='30' transform='rotate(36 126 98)'/%3E%3Crect x='90' y='56' width='8' height='100' rx='4'/%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.14;
         }
 
         .owner-growth {
-            display: flex;
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
             align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            background: linear-gradient(135deg, #ffffff 0%, #f3f8fd 100%);
+            gap: 16px;
+            background: #DCDDD2;
+            border: 1px solid #c8ccb9;
+            border-radius: 18px;
+            padding: 16px 18px;
+            margin-top: 0;
+        }
+
+        .owner-growth::before,
+        .owner-growth::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
+
+        .owner-growth::before {
+            width: 172px;
+            height: 172px;
+            left: -56px;
+            bottom: -62px;
+            opacity: 0.16;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg fill='%231f6b5c'%3E%3Cellipse cx='88' cy='60' rx='20' ry='40' transform='rotate(-24 88 60)'/%3E%3Cellipse cx='124' cy='90' rx='19' ry='38' transform='rotate(-8 124 90)'/%3E%3Cellipse cx='136' cy='132' rx='18' ry='34' transform='rotate(14 136 132)'/%3E%3Crect x='96' y='56' width='8' height='118' rx='4'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .owner-growth::after {
+            width: 148px;
+            height: 148px;
+            right: -42px;
+            top: -26px;
+            opacity: 0.12;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%23205a4f'%3E%3Cellipse cx='72' cy='78' rx='15' ry='32' transform='rotate(-30 72 78)'/%3E%3Cellipse cx='104' cy='60' rx='15' ry='32' transform='rotate(18 104 60)'/%3E%3Cellipse cx='122' cy='96' rx='13' ry='26' transform='rotate(34 122 96)'/%3E%3Crect x='92' y='58' width='7' height='90' rx='3.5'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .owner-growth > * {
+            position: relative;
+            z-index: 1;
         }
 
         .owner-growth h2 {
             margin: 0 0 6px;
-            font-size: 1.28rem;
-            color: #113a5c;
+            font-size: 1.62rem;
+            color: var(--brand-teal-dark);
         }
 
         .owner-growth p {
-            color: #4f667c;
+            color: #526d7f;
             line-height: 1.5;
+        }
+
+        .owner-growth-benefits {
+            margin-top: 10px;
+        }
+
+        .owner-growth-benefits-title {
+            margin: 0 0 6px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--brand-teal-dark);
+        }
+
+        .owner-growth-benefits-list {
+            margin: 0;
+            padding-left: 18px;
+            color: #4c687b;
+            display: grid;
+            gap: 4px;
+            font-size: 0.92rem;
+            line-height: 1.45;
         }
 
         .owner-growth .btn {
             white-space: nowrap;
+            justify-self: end;
+            align-self: end;
+            position: relative;
+            z-index: 3;
+        }
+
+        .owner-growth-media {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 176px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #d3e4d9;
+            background: linear-gradient(160deg, #edf7f1 0%, #e5f0ea 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .owner-growth-media img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .owner-growth-media .btn {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            z-index: 4;
+            margin: 0;
+            box-shadow: 0 8px 20px rgba(255, 106, 61, 0.34);
         }
 
         .top-layout {
             display: grid;
-            grid-template-columns: minmax(320px, 1fr) minmax(0, 2fr);
+            grid-template-columns: minmax(320px, 1.04fr) minmax(0, 1.6fr);
             gap: 14px;
             align-items: stretch;
-            margin-bottom: 14px;
+            margin-bottom: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .filter-intro {
             margin: 0 0 12px;
-            color: #11395f;
-            font-size: 0.97rem;
-            font-weight: 700;
-            line-height: 1.45;
-            letter-spacing: 0.01em;
+            color: #e2f3eb;
+        }
+
+        .filter-intro h1 {
+            margin-bottom: 8px;
+            max-width: 20ch;
+            color: #f5fff9;
+        }
+
+        .filter-intro p {
+            font-size: 1.02rem;
+            line-height: 1.4;
+            color: #dff1e9;
+            max-width: 34ch;
         }
 
         .filter-panel {
             display: flex;
             flex-direction: column;
             height: 100%;
+            background: #1F6B5C;
+            border-color: #1a5d4f;
+            backdrop-filter: blur(2px);
         }
 
         .filter-panel form {
@@ -164,19 +457,20 @@
             display: block;
             font-size: 0.86rem;
             font-weight: 600;
-            color: var(--muted);
-            margin-bottom: 6px;
+            color: #e2f3eb;
+            margin-bottom: 7px;
         }
 
         input[type="text"], select, .multi-trigger {
             width: 100%;
             height: 44px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            border: 1px solid #dfd8d2;
+            border-radius: 11px;
             padding: 10px 12px;
             font: inherit;
-            background: #fff;
-            color: var(--text);
+            background: #fffdfb;
+            color: #193e50;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
 
         .multi-trigger {
@@ -186,32 +480,32 @@
 
         .multi-menu {
             position: absolute;
-            z-index: 20;
+            z-index: 120;
             left: 0;
             right: 0;
             top: calc(100% + 6px);
             background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            border: 1px solid #eaded5;
+            border-radius: 13px;
             padding: 8px;
             display: none;
             max-height: 230px;
             overflow: auto;
-            box-shadow: 0 12px 20px rgba(10, 31, 50, 0.12);
+            box-shadow: 0 14px 28px rgba(19, 47, 68, 0.14);
         }
 
         .multi-menu.open { display: block; }
 
         .suggestions {
             position: absolute;
-            z-index: 30;
+            z-index: 130;
             left: 0;
             right: 0;
             top: calc(100% + 6px);
             background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 0 12px 20px rgba(10, 31, 50, 0.12);
+            border: 1px solid #eaded5;
+            border-radius: 13px;
+            box-shadow: 0 14px 28px rgba(19, 47, 68, 0.14);
             overflow: hidden;
             display: none;
         }
@@ -255,35 +549,40 @@
         .filter-panel .actions .btn {
             width: 100%;
             text-align: center;
+            height: 46px;
+            font-size: 1rem;
+            border-radius: 11px;
         }
 
         .list {
             display: grid;
-            gap: 10px;
+            gap: 12px;
         }
 
         .map-wrap {
             overflow: hidden;
-            padding: 0;
+            padding: 0 0 8px;
             display: flex;
             flex-direction: column;
             height: 100%;
+            background: #fffffe;
+            border-color: #eadfd5;
         }
 
         #results-map {
             width: 100%;
             min-height: 420px;
             flex: 1 1 auto;
-            border-radius: 14px;
+            border-radius: 18px 18px 0 0;
         }
 
         .map-legend {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            padding: 10px 12px 12px;
-            border-top: 1px solid #dce7f2;
-            background: #f7fbff;
+            padding: 10px 12px 8px;
+            border-top: 1px solid #f0e2d7;
+            background: #fffaf6;
         }
 
         .map-legend-item {
@@ -291,33 +590,35 @@
             align-items: center;
             gap: 6px;
             border-radius: 999px;
-            border: 1px solid #d2e2ee;
-            background: #fff;
-            padding: 4px 10px;
-            font-size: 0.84rem;
-            color: #244a68;
+            border: 1px solid #e8d9ce;
+            background: #fffcfa;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            color: #2d4b5f;
             cursor: pointer;
             user-select: none;
             transition: all 0.15s ease;
         }
 
         .map-legend-item.active {
-            border-color: #1e5f95;
-            background: #e9f2fb;
-            color: #0f4f7c;
-            box-shadow: 0 4px 10px rgba(20, 79, 124, 0.18);
+            border-color: #f7bc99;
+            background: #fff2e8;
+            color: var(--brand-teal-dark);
+            box-shadow: 0 6px 16px rgba(238, 123, 71, 0.22);
         }
 
         .location-name {
-            font-size: 1.1rem;
+            font-size: 1.72rem;
             font-weight: 700;
             margin: 0;
+            color: var(--brand-teal-dark);
         }
 
         .muted {
             color: var(--muted);
-            font-size: 0.95rem;
+            font-size: 1.04rem;
             margin-top: 4px;
+            line-height: 1.5;
         }
 
         .owner-subtle {
@@ -327,7 +628,7 @@
         }
 
         .owner-subtle a {
-            color: #0f4f7c;
+            color: var(--brand-teal-dark);
             font-weight: 600;
             text-decoration: none;
         }
@@ -344,38 +645,40 @@
         }
 
         .tag {
-            background: #e8f7f0;
-            color: #0d6b49;
-            font-size: 0.8rem;
+            background: #e9f3ee;
+            color: #24584d;
+            font-size: 0.87rem;
             border-radius: 99px;
-            padding: 4px 9px;
+            padding: 6px 11px;
+            border: 1px solid #d2e4da;
         }
 
         .location-card {
             display: grid;
-            grid-template-columns: 190px minmax(0, 1fr) 260px;
-            gap: 14px;
-            align-items: start;
+            grid-template-columns: 260px minmax(0, 1fr) 290px;
+            gap: 18px;
+            align-items: stretch;
         }
 
         .opening-card {
-            border: 1px solid #d7e4f0;
-            border-radius: 10px;
-            background: #f8fbff;
-            padding: 10px 12px;
+            border: 1px solid #e8ddd3;
+            border-radius: 16px;
+            background: #fffaf6;
+            padding: 14px 14px;
+            align-self: center;
         }
 
         .opening-title {
             margin: 0 0 8px;
             font-size: 0.92rem;
             font-weight: 700;
-            color: #123d60;
+            color: var(--brand-navy);
         }
 
         .opening-today {
             margin: 0 0 8px;
             font-size: 0.9rem;
-            color: #204d70;
+            color: #365d77;
         }
 
         .opening-today strong {
@@ -405,9 +708,9 @@
 
         .location-photo {
             width: 100%;
-            height: 120px;
+            height: 190px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 16px;
             border: 1px solid var(--border);
             background: #edf2f7;
         }
@@ -437,6 +740,21 @@
             border: 1px solid #bce8d4;
         }
 
+        .overview-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid #e8ddd3;
+            background: #fff9f5;
+            color: var(--brand-teal-dark);
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 6px 14px rgba(17, 48, 74, 0.07);
+        }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -444,10 +762,10 @@
         }
 
         .stat-item {
-            border: 1px solid #cfe0ee;
-            border-radius: 10px;
-            padding: 10px 12px;
-            background: #f7fbff;
+            border: 1px solid #e6dacf;
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: #fffaf5;
         }
 
         .stat-label {
@@ -460,7 +778,7 @@
             margin: 0;
             font-size: 1.25rem;
             font-weight: 700;
-            color: #103455;
+            color: var(--brand-navy);
         }
 
         .pager {
@@ -476,9 +794,9 @@
             color: #21415e;
             text-decoration: none;
             padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #c7d6e5;
-            background: #f8fbfe;
+            border-radius: 10px;
+            border: 1px solid #e5d9cd;
+            background: #fffaf7;
         }
 
         .pager span.disabled {
@@ -489,7 +807,7 @@
 
         @media (max-width: 980px) {
             .location-card {
-                grid-template-columns: 160px minmax(0, 1fr);
+                grid-template-columns: 220px minmax(0, 1fr);
             }
 
             .opening-card {
@@ -498,32 +816,317 @@
         }
 
         @media (max-width: 760px) {
+            body::before {
+                width: 220px;
+                height: 240px;
+                left: -90px;
+                bottom: -80px;
+                opacity: 0.14;
+            }
+            body::after {
+                width: 170px;
+                height: 190px;
+                right: -82px;
+                top: 46%;
+                opacity: 0.12;
+            }
+            .container::before {
+                width: 140px;
+                height: 140px;
+                left: -70px;
+                top: 620px;
+            }
+            .container::after {
+                width: 120px;
+                height: 120px;
+                right: -56px;
+                bottom: 120px;
+            }
             .top-layout {
                 grid-template-columns: 1fr;
             }
+            .hero-stage {
+                padding: 10px;
+            }
             .owner-growth {
-                flex-direction: column;
-                align-items: flex-start;
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+            .owner-growth-media {
+                height: 150px;
+                max-width: 360px;
+            }
+            .owner-growth-media .btn {
+                right: 10px;
+                bottom: 10px;
             }
             .stats { grid-template-columns: 1fr; }
             .field-search, .field-radius, .field-options { flex: 1 1 auto; }
-            h1 { font-size: 1.6rem; }
+            h1 { font-size: 1.62rem; }
             .location-card { grid-template-columns: 1fr; }
-            .promo-bar-inner {
-                padding: 14px 12px;
-                font-size: 0.95rem;
-                line-height: 1.4;
+            #results-map { min-height: 320px; }
+            .hero-stage {
+                background-size:
+                    100% 100%
+                    @if($heroBackdropUrl)
+                        , cover
+                    @endif
+                ;
+            }
+            .hero-stage::before {
+                width: 162px;
+                height: 162px;
+                left: -48px;
+                bottom: -40px;
+            }
+            .hero-stage::after {
+                width: 130px;
+                height: 130px;
+                right: -40px;
+                top: -38px;
+            }
+            .owner-growth::before {
+                width: 128px;
+                height: 128px;
+                left: -44px;
+                bottom: -52px;
+            }
+            .owner-growth::after {
+                width: 110px;
+                height: 110px;
+                right: -34px;
+                top: -24px;
+            }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .feature-card {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(200px, 40%);
+            align-items: stretch;
+            gap: 12px;
+            background: linear-gradient(145deg, #f6fbf8 0%, #eef8f3 56%, #fff8f1 100%);
+            border: 1px solid #dce9e2;
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.2s ease, box-shadow 0.24s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(17, 48, 74, 0.12);
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            height: 100%;
+        }
+
+        .card-illustration {
+            position: relative;
+            z-index: 2;
+            min-height: 220px;
+            border-radius: 18px;
+            overflow: hidden;
+            align-self: stretch;
+            background: rgba(255, 255, 255, 0.52);
+            border: 1px solid rgba(222, 234, 226, 0.95);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .card-illustration svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .card-illustration img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .feature-card::before,
+        .feature-card::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            background-repeat: no-repeat;
+            background-size: contain;
+            z-index: 0;
+        }
+
+        .feature-card::before {
+            width: 152px;
+            height: 152px;
+            left: -52px;
+            top: -34px;
+            opacity: 0.16;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='%231f6b5c'%3E%3Cellipse cx='72' cy='80' rx='16' ry='34' transform='rotate(-28 72 80)'/%3E%3Cellipse cx='106' cy='62' rx='16' ry='33' transform='rotate(18 106 62)'/%3E%3Cellipse cx='124' cy='96' rx='14' ry='28' transform='rotate(34 124 96)'/%3E%3Crect x='92' y='58' width='7' height='92' rx='3.5'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .feature-card::after {
+            width: 178px;
+            height: 178px;
+            right: -58px;
+            bottom: -84px;
+            opacity: 0.13;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'%3E%3Cg fill='%231f6b5c'%3E%3Cellipse cx='90' cy='60' rx='20' ry='40' transform='rotate(-24 90 60)'/%3E%3Cellipse cx='126' cy='90' rx='19' ry='38' transform='rotate(-8 126 90)'/%3E%3Cellipse cx='138' cy='132' rx='18' ry='34' transform='rotate(14 138 132)'/%3E%3Crect x='98' y='56' width='8' height='118' rx='4'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .feature-card h3 {
+            margin: 0 0 10px;
+            color: var(--brand-teal-dark);
+            font-size: 2.08rem;
+            line-height: 1.1;
+        }
+
+        .feature-card p {
+            color: #4f6677;
+            font-size: 1.06rem;
+            line-height: 1.55;
+            max-width: 32ch;
+        }
+
+        .feature-icon {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid #e8ddd2;
+            box-shadow: 0 8px 18px rgba(17, 48, 74, 0.08);
+            opacity: 0.96;
+        }
+
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .feature-card .btn {
+            margin-top: auto;
+        }
+
+        .feature-card.gymbuddy-card {
+            background: linear-gradient(130deg, #eef8f1 0%, #e6f4ea 52%, #f8fff8 100%);
+            border-color: #d2e6db;
+        }
+
+        .feature-card.gymbuddy-card .card-illustration {
+            background: linear-gradient(180deg, rgba(230, 244, 236, 0.35) 0%, rgba(230, 244, 236, 0.55) 100%);
+            background-repeat: no-repeat;
+        }
+
+        .feature-card.trainer-card {
+            background: linear-gradient(130deg, #fff6ef 0%, #fdf2e8 52%, #fffaf5 100%);
+            border-color: #eadfd6;
+        }
+
+        .feature-card.gymbuddy-card p {
+            max-width: 23ch;
+            font-size: 0.99rem;
+            color: #2f495d;
+        }
+
+        .feature-card.trainer-card p {
+            max-width: 26ch;
+        }
+
+        .hero-stage::before,
+        .hero-stage::after,
+        .owner-growth::before,
+        .owner-growth::after,
+        .feature-card::before,
+        .feature-card::after {
+            content: none;
+        }
+
+        .gm-site-footer {
+            margin-top: 34px;
+            background:
+                radial-gradient(780px 240px at 20% -20%, rgba(255, 154, 106, 0.18), transparent 62%),
+                linear-gradient(135deg, #103f48 0%, #0e5b57 56%, #0d4f5d 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gm-site-footer-inner {
+            padding: 24px 20px;
+        }
+
+        .gm-site-footer a {
+            color: #ffe1d0;
+        }
+
+        @media (max-width: 980px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-card {
+                grid-template-columns: minmax(0, 1fr) minmax(180px, 34%);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .feature-card {
+                grid-template-columns: 1fr;
+                padding: 18px;
+            }
+
+            .feature-card h3 {
+                font-size: 1.72rem;
+            }
+
+            .card-illustration {
+                min-height: 180px;
+                order: 2;
+            }
+
+            .feature-card::before {
+                width: 96px;
+                height: 96px;
+                left: -34px;
+                top: -24px;
+            }
+            .feature-card::after {
+                width: 102px;
+                height: 102px;
+                right: -46px;
+                bottom: -58px;
+            }
+            .gm-nav-logo {
+                width: clamp(190px, 44vw, 250px);
+                min-width: 190px;
             }
         }
     </style>
 </head>
 <body>
-<div class="promo-bar">
-    <div class="promo-bar-inner">
-        Jouw sportschool hier belichten? Dat kan.
-        <a href="{{ route('pages.contact') }}">Mail ons via het contactformulier!</a>
-    </div>
-</div>
 @include('partials.site-header')
 
 <div class="container">
@@ -532,69 +1135,91 @@
         <div class="flash">{{ session('status') }}</div>
     @endif
 
-    <section class="top-layout">
-        <aside class="card filter-panel">
-            <div class="filter-intro">
-                <p>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</p>
-            </div>
-            <form method="GET" action="{{ route('home') }}">
-                <div class="field-search">
-                    <label class="field-label" for="q">Zoek op locatie / adres / postcode</label>
-                    <input id="q" type="text" name="q" value="{{ $query }}" placeholder="Bijv. Utrecht, 3511 NS of Oudegracht 100">
-                    <div class="suggestions" id="searchSuggestions"></div>
-                </div>
+    @if(request()->routeIs('overview'))
+        <p class="overview-label">📍 Resultatenoverzicht</p>
+    @endif
 
-                <div class="field-options" id="sportsFilter">
-                    <label class="field-label">Sport opties (multi-select)</label>
-                    <button type="button" class="multi-trigger" id="multiTrigger">Kies sporten</button>
-                    <div class="multi-menu" id="multiMenu">
-                        @foreach($sports as $sport)
-                            <label class="opt">
-                                <input type="checkbox" name="sports[]" value="{{ $sport->id }}" @checked($selectedSports->contains($sport->id))>
-                                {{ $sport->name }}
-                            </label>
-                        @endforeach
+    <section class="hero-stage">
+        <div class="top-layout">
+            <aside class="card filter-panel">
+                <div class="filter-intro">
+                    <h1>Zin om te sporten?</h1>
+                    <p>Vind hier de sportschool of andere sportactiviteit bij jou in de buurt!</p>
+                </div>
+                <form method="GET" action="{{ route('overview') }}">
+                    <div class="field-search">
+                        <label class="field-label" for="q">Zoek op locatie / adres / postcode</label>
+                        <input id="q" type="text" name="q" value="{{ $query }}" placeholder="Bijv. Utrecht, 3511 NS of Oudegracht 100">
+                        <div class="suggestions" id="searchSuggestions"></div>
                     </div>
-                </div>
 
-                <div class="field-radius">
-                    <label class="field-label" for="radius">Radius</label>
-                    <select id="radius" name="radius">
-                        <option value="5" @selected($radius === 5)>5 km</option>
-                        <option value="10" @selected($radius === 10)>10 km</option>
-                        <option value="20" @selected($radius === 20)>20 km</option>
-                        <option value="50" @selected($radius === 50)>50 km</option>
-                        <option value="250" @selected($radius === 250)>50+ km</option>
-                    </select>
-                </div>
+                    <div class="field-options" id="sportsFilter">
+                        <label class="field-label">Sport opties</label>
+                        <button type="button" class="multi-trigger" id="multiTrigger">Kies sporten</button>
+                        <div class="multi-menu" id="multiMenu">
+                            @foreach($sports as $sport)
+                                <label class="opt">
+                                    <input type="checkbox" name="sports[]" value="{{ $sport->id }}" @checked($selectedSports->contains($sport->id))>
+                                    {{ $sport->name }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
 
-                <div class="actions">
-                    <button class="btn btn-primary" type="submit">Vind locaties</button>
-                </div>
-            </form>
-        </aside>
+                    <div class="field-radius">
+                        <label class="field-label" for="radius">Radius</label>
+                        <select id="radius" name="radius">
+                            <option value="5" @selected($radius === 5)>5 km</option>
+                            <option value="10" @selected($radius === 10)>10 km</option>
+                            <option value="20" @selected($radius === 20)>20 km</option>
+                            <option value="50" @selected($radius === 50)>50 km</option>
+                            <option value="250" @selected($radius === 250)>50+ km</option>
+                        </select>
+                    </div>
 
-        <article class="card map-wrap">
-            <div id="results-map"></div>
-            <div class="map-legend">
-                <button type="button" class="map-legend-item active" data-category="all">🗺️ Alles</button>
-                <button type="button" class="map-legend-item" data-category="fitness">🏋️ Fitness / krachttraining</button>
-                <button type="button" class="map-legend-item" data-category="boxing">🥊 Boksschool</button>
-                <button type="button" class="map-legend-item" data-category="yoga">🧘 Yogastudio</button>
-                <button type="button" class="map-legend-item" data-category="crossfit">🏋️‍♂️ CrossFit</button>
-                <button type="button" class="map-legend-item" data-category="other">📍 Overig</button>
-            </div>
-        </article>
+                    <div class="actions">
+                        <button class="btn btn-primary" type="submit">zoek alle gyms</button>
+                    </div>
+                </form>
+            </aside>
+
+            <article class="card map-wrap">
+                <div id="results-map"></div>
+                <div class="map-legend">
+                    <button type="button" class="map-legend-item active" data-category="all">📍 Alles</button>
+                    <button type="button" class="map-legend-item" data-category="fitness">🏋️ Fitness / krachttraining</button>
+                    <button type="button" class="map-legend-item" data-category="boxing">🥊 Boksschool</button>
+                    <button type="button" class="map-legend-item" data-category="yoga">🧘 Yogastudio</button>
+                    <button type="button" class="map-legend-item" data-category="crossfit">🏋️‍♂️ CrossFit</button>
+                    <button type="button" class="map-legend-item" data-category="other">📌 Overig</button>
+                </div>
+            </article>
+        </div>
     </section>
 
     <section class="card owner-growth">
-        <div>
-            <h2>Heb jij een sportschool?</h2>
-            <p>Vergroot je zichtbaarheid via GymMaps met een premium vermelding voor €20 per maand.</p>
-        </div>
-        <a class="btn btn-primary" href="{{ route('pages.pricing') }}">Bekijk tarieven</a>
+            <div>
+                <h2>Heb jij een sportschool?</h2>
+                <p>Vergroot je zichtbaarheid en bereik sporters in jouw omgeving.</p>
+                <div class="owner-growth-benefits">
+                    <p class="owner-growth-benefits-title">Voordelen</p>
+                    <ul class="owner-growth-benefits-list">
+                        <li>Meer zichtbaarheid in jouw stad</li>
+                        <li>Bovenaan in zoekresultaten</li>
+                        <li>Proefles aanvragen ontvangen</li>
+                        <li>Professioneel profiel</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="owner-growth-media" aria-hidden="true">
+                @if($ownerGrowthImageUrl)
+                    <img src="{{ $ownerGrowthImageUrl }}" alt="Premium sportschool stockfoto">
+                @endif
+                <a class="btn btn-primary" href="{{ route('pages.pricing') }}">Bekijk Premium</a>
+            </div>
     </section>
 
+    @if($showOverview ?? true)
     <section class="list">
         @if($isUsingFallbackSource)
             <article class="card">
@@ -707,6 +1332,104 @@
                 <p class="muted">Controleer de filters en radius, of importeer KVK-data opnieuw zodat kaart en overzicht gevuld worden.</p>
             </article>
         @endif
+    </section>
+    @endif
+
+    <section class="feature-grid" aria-label="GymMaps extra opties">
+        <article class="feature-card gymbuddy-card">
+            <div class="card-content">
+                <h3>Gymbuddy</h3>
+                <p>Vindt jouw sportmaatje makkelijk en snel door het plaatsen van een oproep.</p>
+                <a class="btn btn-primary" href="{{ route('gymbuddy.index') }}">Vind hier jouw Gymbuddy</a>
+            </div>
+            <div class="card-illustration" aria-hidden="true">
+                @if($gymbuddyCardBgUrl)
+                    <img src="{{ $gymbuddyCardBgUrl }}" alt="Gymbuddy illustratie">
+                @else
+                    <svg viewBox="0 0 420 300" role="img" focusable="false">
+                        <defs>
+                            <linearGradient id="buddyBg" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#dff2e8"/>
+                                <stop offset="100%" stop-color="#effaf3"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="420" height="300" fill="url(#buddyBg)"/>
+                        <g opacity=".16" fill="#1f6b5c">
+                            <ellipse cx="68" cy="68" rx="42" ry="20"/>
+                            <ellipse cx="366" cy="64" rx="38" ry="18"/>
+                        </g>
+                        <g opacity=".2" fill="#2a7d6a">
+                            <ellipse cx="42" cy="252" rx="58" ry="34"/>
+                            <ellipse cx="392" cy="244" rx="64" ry="38"/>
+                        </g>
+                        <g>
+                            <circle cx="154" cy="116" r="22" fill="#ffbc8a"/>
+                            <rect x="125" y="138" width="62" height="80" rx="24" fill="#1f6b5c"/>
+                            <rect x="132" y="218" width="22" height="54" rx="10" fill="#6da893"/>
+                            <rect x="160" y="218" width="22" height="54" rx="10" fill="#6da893"/>
+                            <path d="M178 146c22 8 42 24 58 42" stroke="#ff955f" stroke-width="14" stroke-linecap="round"/>
+                            <rect x="145" y="176" width="20" height="32" rx="8" fill="#5bbca7"/>
+                        </g>
+                        <g>
+                            <circle cx="264" cy="114" r="21" fill="#ffc49a"/>
+                            <rect x="236" y="136" width="58" height="84" rx="22" fill="#2c8a73"/>
+                            <rect x="240" y="220" width="22" height="52" rx="10" fill="#2f7365"/>
+                            <rect x="270" y="220" width="22" height="52" rx="10" fill="#2f7365"/>
+                            <path d="M238 150c-15 9-24 19-39 34" stroke="#ff955f" stroke-width="13" stroke-linecap="round"/>
+                            <rect x="254" y="174" width="18" height="34" rx="8" fill="#5bbca7"/>
+                        </g>
+                        <circle cx="215" cy="164" r="11" fill="#ff6a3d"/>
+                    </svg>
+                @endif
+            </div>
+        </article>
+
+        <article class="feature-card trainer-card">
+            <div class="card-content">
+                <h3>Personal Trainer</h3>
+                <p>Plaats een oproep als je op zoek bent naar een ervaren personal trainer die je helpt jouw doelen te bereiken.</p>
+                <a class="btn btn-primary" href="{{ route('pages.personal-trainer') }}">Vindt hier jouw Personal Trainer</a>
+            </div>
+            <div class="card-illustration" aria-hidden="true">
+                @if($trainerCardImageUrl)
+                    <img src="{{ $trainerCardImageUrl }}" alt="Personal trainer illustratie">
+                @else
+                    <svg viewBox="0 0 420 300" role="img" focusable="false">
+                        <defs>
+                            <linearGradient id="trainerBg" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#fff1e6"/>
+                                <stop offset="100%" stop-color="#fff8f2"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="420" height="300" fill="url(#trainerBg)"/>
+                        <g opacity=".18" fill="#1f6b5c">
+                            <ellipse cx="58" cy="252" rx="66" ry="34"/>
+                            <ellipse cx="372" cy="248" rx="58" ry="30"/>
+                        </g>
+                        <g>
+                            <circle cx="154" cy="112" r="21" fill="#ffc6a1"/>
+                            <rect x="124" y="134" width="62" height="82" rx="22" fill="#1f6b5c"/>
+                            <rect x="128" y="216" width="22" height="58" rx="10" fill="#487f70"/>
+                            <rect x="157" y="216" width="22" height="58" rx="10" fill="#487f70"/>
+                            <path d="M186 152c26 0 42 18 60 24" stroke="#ff6a3d" stroke-width="12" stroke-linecap="round"/>
+                        </g>
+                        <g>
+                            <circle cx="262" cy="120" r="20" fill="#ffd2b3"/>
+                            <rect x="236" y="140" width="56" height="78" rx="22" fill="#2e8e77"/>
+                            <rect x="240" y="218" width="20" height="56" rx="10" fill="#286c60"/>
+                            <rect x="266" y="218" width="20" height="56" rx="10" fill="#286c60"/>
+                            <rect x="210" y="162" width="26" height="12" rx="6" fill="#ff6a3d"/>
+                            <rect x="286" y="162" width="26" height="12" rx="6" fill="#ff6a3d"/>
+                            <path d="M236 156c-16 4-28 8-42 12" stroke="#ffc59e" stroke-width="10" stroke-linecap="round"/>
+                        </g>
+                        <g fill="#2f7f6f" opacity=".38">
+                            <ellipse cx="334" cy="86" rx="18" ry="34" transform="rotate(-24 334 86)"/>
+                            <ellipse cx="358" cy="112" rx="14" ry="28" transform="rotate(12 358 112)"/>
+                        </g>
+                    </svg>
+                @endif
+            </div>
+        </article>
     </section>
 </div>
 <script>
@@ -929,7 +1652,7 @@
                     ? `<br><img src="${escapeHtml(photoCandidate)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:cover;border-radius:6px;margin-top:6px;" onerror="this.onerror=null;this.src='${escapeHtml(location.fallback_photo_url || '')}'">`
                     : '<br><span style="display:inline-block;margin-top:8px;color:#5c6f82;">Geen foto beschikbaar</span>';
                 const detailLink = location.detail_url
-                    ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
+                    ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#ff6a3d;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
                     : '';
                 marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${escapeHtml(location.address)}${distanceLine}${photoLine}${detailLink}`);
                 markerRefs.push(marker);
@@ -1129,7 +1852,7 @@
                         ? `<br><img src="${escapeHtml(location.logo_url || location.photo_url)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:${location.logo_url ? 'contain' : 'cover'};padding:${location.logo_url ? '8px' : '0'};background:#fff;border-radius:6px;margin-top:6px;" ${location.logo_url ? `data-fallback="${escapeHtml(location.photo_url || '')}"` : ''} data-final-fallback="${escapeHtml(location.fallback_photo_url || '')}" onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.style.objectFit='cover';this.style.padding='0';this.dataset.fallback='';return;}if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';return;}this.onerror=null;">`
                         : "";
                     const detailLink = location.detail_url
-                        ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
+                        ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#ff6a3d;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
                         : "";
                     infoWindow.setContent(
                         `<strong>${escapeHtml(location.name)}</strong><br>${escapeHtml(location.address)}${distanceLine}${photoLine}${detailLink}`
@@ -1316,7 +2039,7 @@
                     ? `<br><img src="${escapeHtml(photoCandidate)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:cover;border-radius:6px;margin-top:6px;" onerror="this.onerror=null;this.src='${escapeHtml(location.fallback_photo_url || '')}'">`
                     : '<br><span style="display:inline-block;margin-top:8px;color:#5c6f82;">Geen foto beschikbaar</span>';
                 const detailLink = location.detail_url
-                    ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
+                    ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#ff6a3d;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
                     : '';
                 marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${escapeHtml(location.address)}${distanceLine}${photoLine}${detailLink}`);
                 markerRefs.push(marker);

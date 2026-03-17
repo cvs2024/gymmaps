@@ -7,17 +7,15 @@
     <title>Blogs</title>
     <meta name="description" content="Lees blogs van GymMaps.nl over sportscholen, gymbuddy's en personal trainers in Nederland.">
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
         :root { --bg:#f4f8fc; --card:#fff; --ink:#10263d; --muted:#4f6276; --line:#d6e2ee; --blue-accent:#0f5e88; --blue-accent-dark:#0c4f74; --blue:#0f4f7c; }
         * { box-sizing:border-box; }
         body {
             margin:0;
             font-family:"Segoe UI",Roboto,sans-serif;
-            color:var(--ink);
-            background:
-                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
-                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
-                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
+            color: var(--gm-brand-text);
+            background: transparent;
         }
         .container { max-width:1120px; margin:0 auto; padding:28px 16px 44px; }
         .hero { background:linear-gradient(130deg,#0f3f73,#1f5e9a); border-radius:18px; color:#fff; padding:24px 22px; margin-bottom:16px; }

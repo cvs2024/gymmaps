@@ -6,8 +6,9 @@
     @include('partials.google-site-verification')
     <title>Import Monitor - Gymmap</title>
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
-        body { margin:0; font-family: "Segoe UI", Roboto, sans-serif; background:#f5f8fc; color:#0e2235; }
+        body { margin:0; font-family: "Segoe UI", Roboto, sans-serif; background:transparent; color:var(--gm-brand-text); }
         .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; }
         .card { background:#fff; border:1px solid #d6e1ec; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
         h1 { margin:0 0 8px; }

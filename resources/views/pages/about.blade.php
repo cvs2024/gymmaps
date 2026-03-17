@@ -7,10 +7,11 @@
     <title>Over ons - GymMaps.nl</title>
     <meta name="description" content="Lees meer over GymMaps.nl en onze missie om sporters en sportlocaties te verbinden.">
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
         :root { --bg:#f2f7fc; --card:#fff; --line:#d8e3ee; --ink:#143451; --muted:#5e7488; }
         *{ box-sizing:border-box; }
-        body{ margin:0; font-family:"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+        body{ margin:0; font-family:"Segoe UI",Roboto,sans-serif; background:transparent; color:var(--gm-brand-text); }
         .container{ max-width:980px; margin:0 auto; padding:28px 16px 44px; }
         .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; }
         h1{ margin:0 0 8px; font-size:2rem; }

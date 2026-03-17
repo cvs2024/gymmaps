@@ -6,6 +6,7 @@
     @include('partials.google-site-verification')
     <title>Sportschool aanmelden - GymMaps.nl</title>
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
         :root {
             --bg: #f4f7fb;
@@ -20,39 +21,11 @@
 
         * { box-sizing: border-box; }
 
-        .promo-bar {
-            width: 100%;
-            background: #dbecef;
-            border-bottom: 1px solid #cfe3e8;
-            color: #11395f;
-        }
-
-        .promo-bar-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px 16px;
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: 500;
-            letter-spacing: 0.01em;
-        }
-
-        .promo-bar a {
-            color: #0f4f7c;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .promo-bar a:hover { text-decoration: underline; }
-
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
-            background:
-                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
-                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
-                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
-            color: var(--ink);
+            background: transparent;
+            color: var(--gm-brand-text);
             min-height: 100vh;
         }
 
@@ -211,12 +184,6 @@
     </style>
 </head>
 <body>
-<div class="promo-bar">
-    <div class="promo-bar-inner">
-        Jouw sportschool hier belichten? Dat kan.
-        <a href="{{ route('pages.contact') }}">Mail ons via het contactformulier!</a>
-    </div>
-</div>
 @include('partials.site-header')
 <div class="container">
     <div class="panel">

@@ -2,14 +2,16 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
 
     :root {
-        --gm-brand-accent: #FF5C39;
-        --gm-brand-accent-dark: #E24C2B;
+        --gm-brand-accent: var(--gm-brand-orange, #FF5C39);
+        --gm-brand-accent-dark: var(--gm-brand-orange-dark, #E24C2B);
+        --gm-brand-teal: var(--gm-brand-teal, #0f5b57);
+        --gm-brand-teal-dark: var(--gm-brand-teal-dark, #0b4945);
     }
 
     .gm-site-nav {
         width: 100%;
-        background: #ffffff;
-        border-bottom: 1px solid #d9e4ee;
+        background: #fefefe;
+        border-bottom: 1px solid #efefef;
         position: relative;
         z-index: 5000;
     }
@@ -17,18 +19,18 @@
     .gm-site-nav-inner {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 5px 18px;
+        padding: 7px 18px;
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        gap: 22px;
+        gap: 28px;
     }
 
     .gm-nav-top {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
+        gap: 16px;
         width: auto;
     }
 
@@ -36,21 +38,22 @@
         display: inline-flex;
         align-items: center;
         text-decoration: none;
-        width: clamp(250px, 26vw, 360px);
-        min-width: 250px;
-        height: 56px;
-        overflow: visible;
+        width: clamp(165px, 16vw, 220px);
+        min-width: 165px;
+        height: 34px;
+        overflow: hidden;
     }
 
     .gm-nav-logo img {
         width: auto;
         max-width: 100%;
         height: auto;
-        max-height: 56px;
+        max-height: 34px;
         object-fit: contain;
         object-position: left center;
         display: block;
-        transform: none;
+        transform: scale(2.35);
+        transform-origin: left center;
     }
 
     .gm-nav-menu {
@@ -94,7 +97,7 @@
 
     .gm-nav-link,
     .gm-nav-item > a {
-        color: #29466a;
+        color: #21465a;
         text-decoration: none;
         line-height: 1.2;
         padding: 4px 0;
@@ -108,7 +111,7 @@
 
     .gm-nav-link:hover,
     .gm-nav-item > a:hover {
-        color: #0f5e88;
+        color: var(--gm-brand-teal);
     }
 
     .gm-nav-link::after,
@@ -119,7 +122,7 @@
         bottom: -6px;
         width: 0;
         height: 2px;
-        background: #0f5e88;
+        background: var(--gm-brand-teal);
         transition: width 0.18s ease;
     }
 
@@ -151,7 +154,7 @@
         left: 0;
         min-width: 220px;
         background: #fff;
-        border: 1px solid #d8e4ef;
+        border: 1px solid #dce9e4;
         border-radius: 10px;
         box-shadow: 0 10px 24px rgba(12, 44, 72, 0.12);
         padding: 8px;
@@ -170,13 +173,13 @@
         font-size: 0.9rem;
         padding: 8px 10px;
         border-radius: 8px;
-        color: #29466a;
+        color: #21465a;
         text-decoration: none;
     }
 
     .gm-nav-dropdown-panel a:hover {
-        background: #eef5fb;
-        color: #0f5e88;
+        background: #edf8f4;
+        color: var(--gm-brand-teal);
     }
 
     .gm-nav-caret-toggle {
@@ -232,12 +235,15 @@
         .gm-nav-toggle { display: inline-flex; }
 
         .gm-nav-logo {
-            width: 280px;
+            width: 170px;
             min-width: 0;
-            height: 52px;
+            height: 32px;
         }
 
-        .gm-nav-logo img { max-height: 52px; }
+        .gm-nav-logo img {
+            max-height: 32px;
+            transform: scale(2.15);
+        }
 
         .gm-nav-menu {
             display: none;
@@ -275,11 +281,11 @@
 </style>
 
 @php
-    $headerLogoPath = config('branding.header_logo_path', 'logo/gymmaps_logo_treatwell_style.png');
+    $headerLogoPath = config('branding.header_logo_path', 'logo/gymmaps-logo-new.png');
     $isExternalLogo = str_starts_with($headerLogoPath, 'http://') || str_starts_with($headerLogoPath, 'https://');
     $normalizedPath = ltrim($headerLogoPath, '/');
     $localLogoExists = !$isExternalLogo && is_file(public_path($normalizedPath));
-    $effectiveLogoPath = $localLogoExists ? $normalizedPath : 'logo/gymmaps_logo_treatwell_style.png';
+    $effectiveLogoPath = $localLogoExists ? $normalizedPath : 'logo/gymmaps-logo-new.png';
     $headerLogoSrc = $isExternalLogo
         ? $headerLogoPath
         : asset($effectiveLogoPath).'?v='.(is_file(public_path($effectiveLogoPath)) ? filemtime(public_path($effectiveLogoPath)) : time());
@@ -301,6 +307,7 @@
                 <details class="gm-nav-dropdown">
                     <summary class="gm-nav-link">Gyms <span class="caret">▾</span></summary>
                     <div class="gm-nav-dropdown-panel">
+                        <a href="{{ route('overview') }}">Overzicht</a>
                         <a href="{{ route('listing-requests.create') }}">Sportschool aanmelden</a>
                         <a href="{{ route('pages.pricing') }}">Tarieven</a>
                     </div>

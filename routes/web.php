@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SearchController::class, 'index'])->name('home');
-Route::redirect('/overzicht', '/', 301);
+Route::get('/overzicht', [SearchController::class, 'index'])->name('overview');
 Route::get('/zoek/suggesties', [SearchController::class, 'suggestions'])->name('home.suggestions');
 Route::view('/login', 'pages.login')->name('login');
 Route::get('/personal-trainer-zoeken', [PersonalTrainerRequestController::class, 'index'])->name('pages.personal-trainer');

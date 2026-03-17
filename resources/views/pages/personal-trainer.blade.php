@@ -6,6 +6,7 @@
     @include('partials.google-site-verification')
     <title>Personal trainer zoeken - GymMaps.nl</title>
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <meta name="description" content="Plaats eenvoudig een oproep voor een personal trainer in jouw regio via GymMaps.nl.">
     <style>
         :root {
@@ -23,11 +24,8 @@
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
-            background:
-                radial-gradient(980px 440px at 10% -12%, rgba(23, 84, 140, 0.18), transparent 60%),
-                radial-gradient(760px 380px at 90% 0%, rgba(31, 118, 168, 0.16), transparent 58%),
-                var(--bg);
-            color: var(--ink);
+            background: transparent;
+            color: var(--gm-brand-text);
             min-height: 100vh;
         }
 

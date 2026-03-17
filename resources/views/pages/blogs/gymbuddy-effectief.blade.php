@@ -7,8 +7,9 @@
     <title>Waarom sporten met een gymbuddy zo effectief is - GymMaps.nl</title>
     <meta name="description" content="Waarom trainen met een gymbuddy zorgt voor meer motivatie en betere resultaten.">
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
-        body{margin:0;font-family:"Segoe UI",Roboto,sans-serif;background:#f4f8fc;color:#12293f}
+        body{margin:0;font-family:"Segoe UI",Roboto,sans-serif;background:transparent;color:var(--gm-brand-text)}
         .container{max-width:920px;margin:0 auto;padding:26px 16px 44px}
         .article{background:#fff;border:1px solid #d6e2ee;border-radius:14px;overflow:hidden}
         .hero{width:100%;height:360px;object-fit:cover;background:#eaf2fa}

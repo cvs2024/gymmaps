@@ -6,8 +6,9 @@
     @include('partials.google-site-verification')
     <title>{{ $location->name }} - Gymmap.nl</title>
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <style>
-        body { margin:0; font-family:"Segoe UI",Roboto,sans-serif; background:#f4f8fc; color:#0e2235; }
+        body { margin:0; font-family:"Segoe UI",Roboto,sans-serif; background:transparent; color:var(--gm-brand-text); }
         .container { max-width: 980px; margin: 0 auto; padding: 24px 16px 40px; }
         .card { background:#fff; border:1px solid #d5e1ec; border-radius:14px; padding:18px; margin-bottom:14px; }
         .hero { display:grid; grid-template-columns:1.2fr 1fr; gap:14px; }

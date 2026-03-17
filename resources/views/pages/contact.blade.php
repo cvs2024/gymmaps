@@ -6,6 +6,7 @@
     @include('partials.google-site-verification')
     <title>Contact - GymMaps.nl</title>
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <meta name="description" content="Neem contact op met GymMaps.nl voor vragen, feedback of het aanmelden van jouw sportlocatie.">
     <style>
         :root {
@@ -20,11 +21,8 @@
         body {
             margin:0;
             font-family:"Segoe UI", Roboto, sans-serif;
-            background:
-                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
-                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
-                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
-            color:var(--ink);
+            background: transparent;
+            color: var(--gm-brand-text);
         }
         .container { max-width:860px; margin:0 auto; padding:28px 16px 40px; }
         .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; box-shadow:0 10px 22px rgba(12, 47, 74, .08); }

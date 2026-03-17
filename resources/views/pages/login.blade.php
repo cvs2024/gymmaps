@@ -6,6 +6,7 @@
     @include('partials.google-site-verification')
     <title>Meld jouw sportlocatie aan op GymMaps.nl</title>
     @include('partials.favicon')
+    @include('partials.brand-theme')
     <meta name="description" content="Maak een bedrijfsprofiel aan op GymMaps.nl en word zichtbaar voor sporters in jouw regio.">
     <style>
         :root {
@@ -25,11 +26,8 @@
         body {
             margin: 0;
             font-family: "Segoe UI", Roboto, sans-serif;
-            background:
-                radial-gradient(1100px 560px at 8% -12%, rgba(22, 96, 162, 0.18), transparent 60%),
-                radial-gradient(920px 500px at 92% 4%, rgba(31, 118, 168, 0.18), transparent 58%),
-                linear-gradient(180deg, #eaf3fc 0%, #f1f7fd 42%, #e9f3fd 100%);
-            color: var(--ink);
+            background: transparent;
+            color: var(--gm-brand-text);
             min-height: 100vh;
         }
 
