@@ -39,6 +39,17 @@
         .opening-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
         .opening-list li { font-size: 0.83rem; color: #4e647a; line-height: 1.35; border-top: 1px solid #e7eef6; padding-top: 4px; }
         .opening-list li:first-child { border-top: 0; padding-top: 0; }
+        .owner-cta {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 1px solid #d8e6f3;
+            border-radius: 10px;
+            background: #f7fbff;
+            color: #4f687e;
+            font-size: 0.9rem;
+        }
+        .owner-cta a { color: #0f4f7c; font-weight: 700; text-decoration: none; }
+        .owner-cta a:hover { text-decoration: underline; }
         #map { width:100%; min-height:280px; border-radius:12px; }
         @media (max-width: 860px) { .hero { grid-template-columns:1fr; } .photo { height:220px; } }
     </style>
@@ -82,6 +93,11 @@
                 <a class="btn btn-ghost" href="{{ route('home') }}">Terug naar overzicht</a>
             </div>
 
+            <p class="owner-cta">
+                Ben jij eigenaar van deze sportschool?
+                <a href="{{ route('pages.pricing') }}">Bekijk de mogelijkheden op GymMaps.</a>
+            </p>
+
             <aside class="opening-card">
                 <p class="opening-title">Openingstijden</p>
                 @if(!empty($openingHoursToday))
@@ -102,17 +118,54 @@
     </article>
 
     <article class="card">
-        @if($googleMapsKey !== '')
-            <div id="map"></div>
-        @else
-            <p class="muted">Kaart is niet actief: voeg <code>GOOGLE_MAPS_API_KEY</code> toe in je .env.</p>
-        @endif
+        <div id="map"></div>
     </article>
 </div>
 
-@if($googleMapsKey !== '')
-    <script>
-        function initLocationMap() {
+<script>
+    function initLocationLeafletFallback() {
+        if (typeof L === 'undefined') {
+            return;
+        }
+        const point = [{{ (float) $location->latitude }}, {{ (float) $location->longitude }}];
+        const map = L.map('map', { zoomControl: true }).setView(point, 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap-bijdragers',
+        }).addTo(map);
+
+        L.marker(point).addTo(map).bindPopup(@json($location->name));
+    }
+
+    function loadLocationLeafletAndInit() {
+        if (window.__locationLeafletBootstrapped) {
+            initLocationLeafletFallback();
+            return;
+        }
+        window.__locationLeafletBootstrapped = true;
+
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+        css.crossOrigin = '';
+        document.head.appendChild(css);
+
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+        script.crossOrigin = '';
+        script.onload = () => initLocationLeafletFallback();
+        document.body.appendChild(script);
+    }
+
+    window.gm_authFailure = function () {
+        loadLocationLeafletAndInit();
+    };
+
+    function initLocationMap() {
+        try {
             const point = { lat: {{ (float) $location->latitude }}, lng: {{ (float) $location->longitude }} };
             const map = new google.maps.Map(document.getElementById('map'), {
                 center: point,
@@ -122,9 +175,24 @@
             });
 
             new google.maps.Marker({ position: point, map, title: @json($location->name) });
+        } catch (error) {
+            loadLocationLeafletAndInit();
         }
-    </script>
+    }
+</script>
+@if($googleMapsKey !== '')
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsKey }}&callback=initLocationMap"></script>
+    <script>
+        window.setTimeout(() => {
+            if (!window.google || !window.google.maps) {
+                loadLocationLeafletAndInit();
+            }
+        }, 4500);
+    </script>
+@else
+    <script>
+        loadLocationLeafletAndInit();
+    </script>
 @endif
 @include('partials.site-footer')
 </body>

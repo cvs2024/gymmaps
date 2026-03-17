@@ -75,6 +75,10 @@
         white-space: nowrap;
     }
 
+    .gm-nav-item.gm-nav-split {
+        gap: 6px;
+    }
+
     .gm-nav-toggle {
         display: none;
         align-items: center;
@@ -173,6 +177,20 @@
     .gm-nav-dropdown-panel a:hover {
         background: #eef5fb;
         color: #0f5e88;
+    }
+
+    .gm-nav-caret-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border: 0;
+        background: transparent;
+        color: #29466a;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.68rem;
     }
 
     @media (min-width: 901px) {
@@ -307,9 +325,10 @@
                 <a href="{{ route('pages.blog') }}">Blog</a>
             </div>
 
-            <div class="gm-nav-item">
+            <div class="gm-nav-item gm-nav-split">
+                <a href="{{ route('pages.contact') }}">Contact</a>
                 <details class="gm-nav-dropdown">
-                    <summary class="gm-nav-link">Contact <span class="caret">▾</span></summary>
+                    <summary class="gm-nav-caret-toggle" aria-label="Open Contact submenu">▾</summary>
                     <div class="gm-nav-dropdown-panel">
                         <a href="{{ route('pages.faq') }}">Veelgestelde vragen</a>
                         <a href="{{ route('pages.about') }}">Over ons</a>

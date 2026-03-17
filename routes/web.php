@@ -6,18 +6,21 @@ use App\Http\Controllers\GymbuddyPostController;
 use App\Http\Controllers\ListingRequestController;
 use App\Http\Controllers\LocationProfileController;
 use App\Http\Controllers\PersonalTrainerRequestController;
+use App\Http\Controllers\PricingController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SearchController::class, 'index'])->name('home');
+Route::redirect('/overzicht', '/', 301);
 Route::get('/zoek/suggesties', [SearchController::class, 'suggestions'])->name('home.suggestions');
 Route::view('/login', 'pages.login')->name('login');
 Route::get('/personal-trainer-zoeken', [PersonalTrainerRequestController::class, 'index'])->name('pages.personal-trainer');
 Route::post('/personal-trainer-zoeken', [PersonalTrainerRequestController::class, 'store'])->name('pages.personal-trainer.store');
 Route::view('/blog', 'pages.blog')->name('pages.blog');
-Route::view('/tarieven', 'pages.pricing')->name('pages.pricing');
+Route::get('/tarieven', [PricingController::class, 'index'])->name('pages.pricing');
+Route::post('/tarieven/premium-aanvraag', [PricingController::class, 'store'])->name('pages.pricing.store');
 Route::view('/over-ons', 'pages.about')->name('pages.about');
 Route::view('/blog/de-beste-sportscholen-in-nederland', 'pages.blogs.best-sportscholen')->name('pages.blog.best-sportscholen');
 Route::view('/blog/sportschool-in-de-buurt-vinden', 'pages.blogs.sportschool-in-de-buurt')->name('pages.blog.sportschool-in-de-buurt');
@@ -49,7 +52,7 @@ Route::get('/mail-test', function (Request $request) {
         abort(403, 'Ongeldige mail test token.');
     }
 
-    $to = trim((string) $request->query('to', (string) env('ADMIN_EMAIL', env('MAIL_FROM_ADDRESS', ''))));
+    $to = trim((string) $request->query('to', (string) config('mail.admin.address', '')));
     if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
         return response()->json([
             'ok' => false,

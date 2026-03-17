@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContactQuestionMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
@@ -32,7 +33,21 @@ class ContactController extends Controller
                 ]);
         }
 
-        Mail::to($toAddress)->send(new ContactQuestionMail($validated));
+        try {
+            Mail::to($toAddress)->send(new ContactQuestionMail($validated));
+        } catch (\Throwable $e) {
+            Log::warning('Kon contactvraag niet versturen.', [
+                'error' => $e->getMessage(),
+                'to' => $toAddress,
+            ]);
+
+            return redirect()
+                ->route('pages.contact')
+                ->withErrors([
+                    'mail' => 'Je vraag is opgeslagen, maar verzenden van e-mail is mislukt. Controleer de mailinstellingen.',
+                ])
+                ->withInput();
+        }
 
         return redirect()
             ->route('pages.contact')

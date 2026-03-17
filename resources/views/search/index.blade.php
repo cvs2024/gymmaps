@@ -100,6 +100,29 @@
             margin-bottom: 14px;
         }
 
+        .owner-growth {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            background: linear-gradient(135deg, #ffffff 0%, #f3f8fd 100%);
+        }
+
+        .owner-growth h2 {
+            margin: 0 0 6px;
+            font-size: 1.28rem;
+            color: #113a5c;
+        }
+
+        .owner-growth p {
+            color: #4f667c;
+            line-height: 1.5;
+        }
+
+        .owner-growth .btn {
+            white-space: nowrap;
+        }
+
         .top-layout {
             display: grid;
             grid-template-columns: minmax(320px, 1fr) minmax(0, 2fr);
@@ -297,6 +320,22 @@
             margin-top: 4px;
         }
 
+        .owner-subtle {
+            margin-top: 8px;
+            font-size: 0.86rem;
+            color: #5d7286;
+        }
+
+        .owner-subtle a {
+            color: #0f4f7c;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .owner-subtle a:hover {
+            text-decoration: underline;
+        }
+
         .tags {
             display: flex;
             flex-wrap: wrap;
@@ -379,6 +418,16 @@
             background: #fff;
         }
 
+        .location-photo.placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #5c6f82;
+            background: linear-gradient(180deg, #eef4fa 0%, #e7f0f8 100%);
+        }
+
         .flash {
             margin-bottom: 10px;
             background: #e8f7f0;
@@ -451,6 +500,10 @@
         @media (max-width: 760px) {
             .top-layout {
                 grid-template-columns: 1fr;
+            }
+            .owner-growth {
+                flex-direction: column;
+                align-items: flex-start;
             }
             .stats { grid-template-columns: 1fr; }
             .field-search, .field-radius, .field-options { flex: 1 1 auto; }
@@ -534,6 +587,14 @@
         </article>
     </section>
 
+    <section class="card owner-growth">
+        <div>
+            <h2>Heb jij een sportschool?</h2>
+            <p>Vergroot je zichtbaarheid via GymMaps met een premium vermelding voor €20 per maand.</p>
+        </div>
+        <a class="btn btn-primary" href="{{ route('pages.pricing') }}">Bekijk tarieven</a>
+    </section>
+
     <section class="list">
         @if($isUsingFallbackSource)
             <article class="card">
@@ -566,20 +627,22 @@
             <article class="card">
                 <div class="location-card">
                     <div>
-                        <img
-                            class="location-photo {{ $location->display_logo_url ? 'logo' : '' }}"
-                            src="{{ $location->display_logo_url ?: ($location->display_photo_url ?: $location->fallback_photo_url) }}"
-                            alt="Foto van {{ $location->name }}"
-                            @if($location->display_logo_url)
-                                data-fallback="{{ $location->display_photo_url }}"
-                                data-final-fallback="{{ $location->fallback_photo_url }}"
-                                onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.classList.remove('logo');this.dataset.fallback='';return;}if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';return;}this.onerror=null;"
-                            @else
-                                onerror="this.onerror=null;this.src='{{ $location->fallback_photo_url }}';this.classList.remove('logo');"
-                            @endif
-                        >
-                        @if(!$location->display_logo_url && !$location->display_photo_url)
-                            <p class="muted" style="margin-top:6px;">Geen foto beschikbaar</p>
+                        @if($location->display_logo_url || $location->display_photo_url)
+                            <img
+                                class="location-photo {{ $location->display_logo_url ? 'logo' : '' }}"
+                                src="{{ $location->display_logo_url ?: $location->display_photo_url }}"
+                                alt="Foto van {{ $location->name }}"
+                                @if($location->display_logo_url)
+                                    data-fallback="{{ $location->display_photo_url }}"
+                                    data-final-fallback="{{ $location->fallback_photo_url }}"
+                                    onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.classList.remove('logo');this.dataset.fallback='';return;}if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';this.classList.remove('logo');return;}this.onerror=null;"
+                                @else
+                                    data-final-fallback="{{ $location->fallback_photo_url }}"
+                                    onerror="if(this.dataset.finalFallback){this.src=this.dataset.finalFallback;this.dataset.finalFallback='';return;}this.onerror=null;"
+                                @endif
+                            >
+                        @else
+                            <div class="location-photo placeholder">Geen foto beschikbaar</div>
                         @endif
                     </div>
                     <div>
@@ -600,6 +663,10 @@
                         @endif
                         <p style="margin-top: 10px;">
                             <a class="btn btn-primary" href="{{ route('locations.show', $location) }}">Bekijk sportschool</a>
+                        </p>
+                        <p class="owner-subtle">
+                            Ben jij eigenaar van deze sportschool?
+                            <a href="{{ route('pages.pricing') }}">Bekijk de mogelijkheden op GymMaps.</a>
                         </p>
                     </div>
                     <aside class="opening-card">
@@ -791,7 +858,148 @@
 </script>
 @if($googleMapsKey !== '')
     <script>
+        function initGymmapLeafletFallback() {
+            const hasSearchCenter = {{ $hasSearchCenter ? 'true' : 'false' }};
+            const hasLocationQuery = {{ $query !== '' ? 'true' : 'false' }};
+            const center = [{{ $mapCenterLat }}, {{ $mapCenterLng }}];
+            const locations = @json($mapLocations);
+            const escapeHtml = (value) =>
+                String(value ?? '')
+                    .replaceAll('&', '&amp;')
+                    .replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('"', '&quot;')
+                    .replaceAll("'", '&#039;');
+
+            if (typeof L === 'undefined') {
+                return;
+            }
+
+            const map = L.map('results-map', { zoomControl: true }).setView(center, {{ $mapZoom }});
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap-bijdragers',
+            }).addTo(map);
+
+            if (hasSearchCenter) {
+                L.circleMarker(center, {
+                    radius: 8,
+                    color: '#ffffff',
+                    weight: 2,
+                    fillColor: '#174f86',
+                    fillOpacity: 1,
+                }).addTo(map).bindPopup('Zoekcentrum');
+            }
+
+            const markerRefs = [];
+            const getCategory = (sports) => {
+                const joined = Array.isArray(sports) ? sports.join(' ').toLowerCase() : '';
+                if (joined.includes('crossfit')) return 'crossfit';
+                if (joined.includes('bok')) return 'boxing';
+                if (joined.includes('yoga')) return 'yoga';
+                if (joined.includes('fitness') || joined.includes('kracht')) return 'fitness';
+                return 'other';
+            };
+
+            const categoryMeta = {
+                fitness: { emoji: '🏋️' },
+                boxing: { emoji: '🥊' },
+                yoga: { emoji: '🧘' },
+                crossfit: { emoji: '🏋️‍♂️' },
+                other: { emoji: '📍' },
+            };
+
+            locations.forEach((location) => {
+                const category = getCategory(location.sports);
+                const icon = L.divIcon({
+                    html: `<div style="width:34px;height:34px;border-radius:50%;background:#0f5f8b;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.3);">${(categoryMeta[category] || categoryMeta.other).emoji}</div>`,
+                    className: '',
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17],
+                });
+
+                const marker = L.marker([location.lat, location.lng], { icon });
+                if (hasLocationQuery) {
+                    marker.addTo(map);
+                }
+                marker.gymmapsCategory = category;
+                const distanceLine = location.distance !== null ? `<br>Afstand: ${location.distance.toFixed(1)} km` : '';
+                const photoCandidate = location.logo_url || location.photo_url;
+                const photoLine = photoCandidate
+                    ? `<br><img src="${escapeHtml(photoCandidate)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:cover;border-radius:6px;margin-top:6px;" onerror="this.onerror=null;this.src='${escapeHtml(location.fallback_photo_url || '')}'">`
+                    : '<br><span style="display:inline-block;margin-top:8px;color:#5c6f82;">Geen foto beschikbaar</span>';
+                const detailLink = location.detail_url
+                    ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
+                    : '';
+                marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${escapeHtml(location.address)}${distanceLine}${photoLine}${detailLink}`);
+                markerRefs.push(marker);
+            });
+
+            const legendItems = Array.from(document.querySelectorAll('.map-legend-item'));
+            const fitVisibleBounds = () => {
+                const visible = markerRefs.filter((marker) => map.hasLayer(marker));
+                if (!visible.length) {
+                    return;
+                }
+                const bounds = L.latLngBounds(visible.map((marker) => marker.getLatLng()));
+                map.fitBounds(bounds, { padding: [28, 28] });
+            };
+
+            const applyLegendFilter = (category) => {
+                legendItems.forEach((item) => {
+                    item.classList.toggle('active', item.dataset.category === category);
+                });
+
+                markerRefs.forEach((marker) => {
+                    const match = hasLocationQuery && (category === 'all' || marker.gymmapsCategory === category);
+                    if (match && !map.hasLayer(marker)) {
+                        marker.addTo(map);
+                    }
+                    if (!match && map.hasLayer(marker)) {
+                        map.removeLayer(marker);
+                    }
+                });
+
+                fitVisibleBounds();
+            };
+
+            legendItems.forEach((item) => {
+                item.addEventListener('click', () => {
+                    applyLegendFilter(item.dataset.category || 'all');
+                });
+            });
+
+            applyLegendFilter(hasLocationQuery ? 'all' : 'none');
+        }
+
+        function loadGymmapLeafletAssetsAndInit() {
+            if (window.__gymmapLeafletBootstrapped) {
+                initGymmapLeafletFallback();
+                return;
+            }
+            window.__gymmapLeafletBootstrapped = true;
+
+            const css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+            css.crossOrigin = '';
+            document.head.appendChild(css);
+
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+            script.crossOrigin = '';
+            script.onload = () => initGymmapLeafletFallback();
+            document.body.appendChild(script);
+        }
+
+        window.gm_authFailure = function () {
+            loadGymmapLeafletAssetsAndInit();
+        };
+
         function initGymmapResultsMap() {
+            try {
             const hasSearchCenter = {{ $hasSearchCenter ? 'true' : 'false' }};
             const hasLocationQuery = {{ $query !== '' ? 'true' : 'false' }};
             const center = {
@@ -1023,10 +1231,19 @@
                 markers.forEach((marker) => marker.setVisible(false));
                 legendItems.forEach((item) => item.classList.remove('active'));
             }
+            } catch (error) {
+                loadGymmapLeafletAssetsAndInit();
+            }
         }
+
+        window.setTimeout(() => {
+            if (!window.google || !window.google.maps) {
+                loadGymmapLeafletAssetsAndInit();
+            }
+        }, 4500);
     </script>
     <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsKey }}&callback=initGymmapResultsMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsKey }}&callback=initGymmapResultsMap" onerror="loadGymmapLeafletAssetsAndInit()"></script>
 @else
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -1094,10 +1311,10 @@
                 }
                 marker.gymmapsCategory = category;
                 const distanceLine = location.distance !== null ? `<br>Afstand: ${location.distance.toFixed(1)} km` : '';
-                const photoCandidate = location.logo_url || location.photo_url || location.fallback_photo_url;
+                const photoCandidate = location.logo_url || location.photo_url;
                 const photoLine = photoCandidate
                     ? `<br><img src="${escapeHtml(photoCandidate)}" alt="${escapeHtml(location.name)}" style="width:160px;height:90px;object-fit:cover;border-radius:6px;margin-top:6px;" onerror="this.onerror=null;this.src='${escapeHtml(location.fallback_photo_url || '')}'">`
-                    : '';
+                    : '<br><span style="display:inline-block;margin-top:8px;color:#5c6f82;">Geen foto beschikbaar</span>';
                 const detailLink = location.detail_url
                     ? `<br><a href="${escapeHtml(location.detail_url)}" style="display:inline-block;margin-top:8px;padding:7px 10px;background:#0f8a5f;color:#fff;text-decoration:none;border-radius:7px;">Bekijk sportschool</a>`
                     : '';

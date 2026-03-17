@@ -27,10 +27,59 @@ class LocationProfileController extends Controller
 
     private function resolvePhotoUrl(Location $location, string $googleMapsKey): ?string
     {
-        if (is_string($location->photo_url) && trim($location->photo_url) !== '') {
-            return $location->photo_url;
+        if (!is_string($location->photo_url)) {
+            return null;
         }
-        return null;
+
+        $photoUrl = trim($location->photo_url);
+        if ($photoUrl === '' || !$this->isUsablePhotoUrl($photoUrl)) {
+            return null;
+        }
+
+        return $photoUrl;
+    }
+
+    private function isUsablePhotoUrl(string $url): bool
+    {
+        if (!$this->isUsableMediaUrl($url)) {
+            return false;
+        }
+
+        $normalized = mb_strtolower($url);
+        $blockedFragments = [
+            'maps.googleapis.com/maps/api/streetview',
+            'maps.googleapis.com/maps/api/staticmap',
+            'maps.gstatic.com/mapfiles',
+            'gstatic.com/mapfiles',
+            '/mapfiles/',
+            'streetview?',
+        ];
+
+        foreach ($blockedFragments as $fragment) {
+            if (str_contains($normalized, $fragment)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function isUsableMediaUrl(string $url): bool
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return false;
+        }
+
+        if (str_starts_with($url, '/')) {
+            return true;
+        }
+
+        if (str_starts_with($url, 'data:image/')) {
+            return true;
+        }
+
+        return filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
 
     private function resolveWebsiteUrl(Location $location): ?string

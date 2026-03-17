@@ -253,38 +253,78 @@ class SearchController extends Controller
 
     private function resolvePhotoUrl(Location $location, string $googleMapsKey): ?string
     {
-        if (is_string($location->photo_url) && trim($location->photo_url) !== '') {
-            return $location->photo_url;
+        if (!is_string($location->photo_url)) {
+            return null;
         }
-        return null;
+
+        $photoUrl = trim($location->photo_url);
+        if ($photoUrl === '' || !$this->isUsablePhotoUrl($photoUrl)) {
+            return null;
+        }
+
+        return $photoUrl;
     }
 
     private function resolveLogoUrl(Location $location): ?string
     {
         if (is_string($location->logo_url) && trim($location->logo_url) !== '') {
-            return trim($location->logo_url);
+            $logoUrl = trim($location->logo_url);
+            if ($this->isUsableMediaUrl($logoUrl)) {
+                return $logoUrl;
+            }
         }
 
         $brandLogo = $this->resolveOfficialGymBrandLogo($location);
-        if ($brandLogo !== null) {
+        if ($brandLogo !== null && $this->isUsableMediaUrl($brandLogo)) {
             return $brandLogo;
         }
+        // Don't use generic website favicons as "logos":
+        // they are often wrong, tiny, or unrelated. If no real logo is known,
+        // we prefer showing the location photo.
+        return null;
+    }
 
-        if (!is_string($location->website) || trim($location->website) === '') {
-            return null;
+    private function isUsablePhotoUrl(string $url): bool
+    {
+        if (!$this->isUsableMediaUrl($url)) {
+            return false;
         }
 
-        $website = trim($location->website);
-        if (!str_starts_with($website, 'http://') && !str_starts_with($website, 'https://')) {
-            $website = 'https://'.$website;
+        $normalized = mb_strtolower($url);
+        $blockedFragments = [
+            'maps.googleapis.com/maps/api/streetview',
+            'maps.googleapis.com/maps/api/staticmap',
+            'maps.gstatic.com/mapfiles',
+            'gstatic.com/mapfiles',
+            '/mapfiles/',
+            'streetview?',
+        ];
+
+        foreach ($blockedFragments as $fragment) {
+            if (str_contains($normalized, $fragment)) {
+                return false;
+            }
         }
 
-        $host = parse_url($website, PHP_URL_HOST);
-        if (!is_string($host) || trim($host) === '') {
-            return null;
+        return true;
+    }
+
+    private function isUsableMediaUrl(string $url): bool
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return false;
         }
 
-        return 'https://www.google.com/s2/favicons?domain='.rawurlencode($host).'&sz=256';
+        if (str_starts_with($url, '/')) {
+            return true;
+        }
+
+        if (str_starts_with($url, 'data:image/')) {
+            return true;
+        }
+
+        return filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
 
     private function resolveOfficialGymBrandLogo(Location $location): ?string

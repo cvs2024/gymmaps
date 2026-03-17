@@ -120,7 +120,7 @@ return [
     ],
 
     'admin' => [
-        'address' => env('ADMIN_EMAIL', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+        'address' => env('ADMIN_EMAIL', env('MAIL_FROM_ADDRESS', 'support@projectmeubelshop.nl')),
         'name' => env('ADMIN_NAME', env('MAIL_FROM_NAME', 'Admin')),
     ],
 
